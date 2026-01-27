@@ -60,7 +60,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'moodmate.urls'
-SITE_ID = 2
+SITE_ID = 3
 
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",

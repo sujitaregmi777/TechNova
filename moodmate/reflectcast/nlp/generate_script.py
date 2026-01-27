@@ -2,7 +2,8 @@ import datetime
 import os
 from dotenv import load_dotenv
 from openai import OpenAI
-from reflectcast.nlp.vector_store import add_reflection, get_similar_reflections
+
+from moodmate.reflectcast.nlp.vector_store import add_reflection, get_similar_reflections
 
 load_dotenv()
 
