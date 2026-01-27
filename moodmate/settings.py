@@ -32,29 +32,26 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    # Django default apps
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-<<<<<<< HEAD
-<<<<<<< HEAD
+    'django.contrib.sites',
+
+    # Local apps
     'accounts',
     'core',
-=======
-     "django.contrib.sites",
-     'accounts',
-     'core',
-     "allauth",
-    "allauth.account",
-    "allauth.socialaccount",
-    "allauth.socialaccount.providers.google",
->>>>>>> origin/feature-moodmate
-=======
-    'core',
->>>>>>> de2008e (Journal Url)
+
+    # Third-party apps
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
 ]
+
 
 MIDDLEWARE = [
     "allauth.account.middleware.AccountMiddleware",
@@ -68,7 +65,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'moodmate.urls'
-SITE_ID = 2
+SITE_ID = 4
 
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
