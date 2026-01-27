@@ -8,6 +8,8 @@ __pycache__/
 # Virtual environment
 env310/
 venv/
+.env
+.env.*
 
 # Django database
 db.sqlite3
