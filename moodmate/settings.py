@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "allauth.socialaccount.providers.google",
 ]
 
+
 MIDDLEWARE = [
     "allauth.account.middleware.AccountMiddleware",
     'django.middleware.security.SecurityMiddleware',
@@ -59,7 +60,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'moodmate.urls'
-SITE_ID = 2
+SITE_ID = 3
 
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
@@ -158,7 +159,7 @@ EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 
 
 
-DEFAULT_FROM_EMAIL = "RoomSiftay <roomsiftay@gmail.com>"
+DEFAULT_FROM_EMAIL = "Moodmate <moodmate@gmail.com>"
 
 
 SESSION_COOKIE_AGE = 1209600  

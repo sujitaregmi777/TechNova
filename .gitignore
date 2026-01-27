@@ -19,6 +19,11 @@ db.sqlite3
 # Django migration cache only (keep migration .py files!)
 */migrations/__pycache__/
 */migrations/*.pyc
+*/migrations/*.py
+__pycache__/
+*.pyc
+venv/
+env/
 
 # Backup folders
 backup_untracked/
