@@ -10,50 +10,7 @@ from .models import EmailOTP
 import random
 import uuid
 
-def register_view(request):
-    if request.method == "POST":
-        data = request.POST.copy()
-        email = data.get("email")
 
-        if email:
-            data["username"] = email
-
-        form = CustomUserCreationForm(data)
-        print("REGISTER VIEW HIT")
-        if form.is_valid():
-            user = form.save(commit=False)
-
-            user.email = email
-            user.username = email
-
-            user.is_active = False
-            user.save()
-
-            otp = generate_otp()
-            EmailOTP.objects.create(user=user, otp=otp)
-
-            
-
-            send_mail(
-                subject="Verify your Moodmate account",
-                message=f"Your OTP is {otp}",
-                from_email="no-reply@moodmate.com",
-                recipient_list=[user.email],
-            )
-
-            request.session["otp_user_id"] = user.id
-
-            messages.success(
-                request,
-                "We have sent a verification code to your email."
-            )
-
-            return redirect("verify_otp")
-
-    else:
-        form = CustomUserCreationForm()
-
-    return render(request, "accounts/register.html", {"form": form})
 
 def generate_otp():
     return str(random.randint(100000, 999999))
