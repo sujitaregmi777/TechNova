@@ -7,10 +7,9 @@ from django.contrib import messages
 from django.conf import settings
 from django.core.mail import send_mail
 from .models import EmailOTP
-import random
-import uuid
-
-
+import random,uuid
+import json
+from django.http import JsonResponse
 
 def generate_otp():
     return str(random.randint(100000, 999999))
@@ -222,57 +221,12 @@ def verify_otp(request):
 
     user = get_object_or_404(User, id=user_id)
 
+
+def set_mood(request):
     if request.method == "POST":
-        entered_otp = request.POST.get("otp")
+        data = json.loads(request.body)
+        request.session["current_mood"] = data.get("mood")
+        return JsonResponse({"status": "ok"})
 
-        try:
-            otp_obj = EmailOTP.objects.get(user=user)
-        except EmailOTP.DoesNotExist:
-            messages.error(request, "OTP expired or invalid.")
-            return redirect("register")
 
-        if entered_otp == otp_obj.otp:
-            otp_obj.delete()  
 
-            user.is_active = True
-            user.save()
-
-            del request.session["otp_user_id"]
-            auth_login(request, user)
-
-            messages.success(request, "Email verified successfully!")
-            return redirect("dashboard")
-        else:
-            messages.error(request, "Invalid OTP. Try again.")
-
-    return render(request, "accounts/verify_otp.html")
-
-def resend_otp(request):
-    user_id = request.session.get("otp_user_id")
-
-    if not user_id:
-        messages.error(request, "Session expired. Please register again.")
-        return redirect("register")
-
-    user = get_object_or_404(User, id=user_id)
-
-    # Delete old OTP if exists
-    EmailOTP.objects.filter(user=user).delete()
-
-    # Generate new OTP
-    otp = generate_otp()
-    EmailOTP.objects.create(user=user, otp=otp)
-
-    send_mail(
-        subject="Your new MoodMate verification code",
-        message=f"Your new OTP is {otp}",
-        from_email="no-reply@moodmate.com",
-        recipient_list=[user.email],
-    )
-
-    messages.success(request, "A new verification code has been sent to your email.")
-    return redirect("verify_otp")
-
-@login_required
-def dashboard(request):
-    return render (request, "accounts/dashboard.html")

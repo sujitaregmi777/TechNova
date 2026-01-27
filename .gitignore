@@ -18,6 +18,10 @@ db.sqlite3
 */migrations/*.pyc
 */migrations/__pycache__/
 */migrations/*.py
+__pycache__/
+*.pyc
+venv/
+env/
 
 # MacOS / Windows system files
 .DS_Store

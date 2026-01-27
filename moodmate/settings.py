@@ -159,7 +159,7 @@ EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 
 
 
-DEFAULT_FROM_EMAIL = "RoomSiftay <roomsiftay@gmail.com>"
+DEFAULT_FROM_EMAIL = "Moodmate <moodmate@gmail.com>"
 
 
 SESSION_COOKIE_AGE = 1209600  
