@@ -28,6 +28,9 @@ __pycache__/
 *.pyc
 venv/
 env/
+# Django migration cache only (keep migration .py files!)
+*/migrations/__pycache__/
+*/migrations/*.pyc
 
 # Backup folders
 backup_untracked/

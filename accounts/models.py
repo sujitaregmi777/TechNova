@@ -18,11 +18,10 @@ class EmailOTP(models.Model):
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    is_guest = models.BooleanField(default=False)
     action_count = models.PositiveIntegerField(default=0)
 
     def __str__(self):
-        return f"{self.user.username} | guest={self.is_guest}"
+        return f"{self.user.username} "
     
 
 class Article(models.Model):

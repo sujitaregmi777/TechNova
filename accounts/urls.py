@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # accounts/urls.py
 from django.urls import path
 from django.contrib.auth import views as auth_views
@@ -64,3 +65,18 @@ urlpatterns = [
 ]
 
 
+=======
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('', views.index, name='index'),
+    path("register/", views.register, name="register"),
+    path('login/', views.login_view, name='login'),
+    path('verify-otp/', views.verify_otp, name='verify_otp'),
+    path('resend-otp/', views.resend_otp, name='resend_otp'),
+    path("dashboard/", views.dashboard, name="dashboard"),
+]
+
+
+>>>>>>> d77af2c (feat: implement journal functionality with CRUD operations and mood tracking)
