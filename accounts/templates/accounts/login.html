@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MoodMate · Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+{% load socialaccount %}
+<body class="min-h-screen bg-gradient-to-br from-[#1a102f] via-[#12091f] to-[#0b0614] flex items-center justify-center">
+
+  <div class="w-full max-w-md bg-[#2a0a4a]/90 backdrop-blur-xl rounded-2xl p-8 shadow-2xl border border-white/10">
+
+    <!-- Header -->
+    <h1 class="text-white text-2xl font-bold text-center">Welcome Back</h1>
+    <p class="text-white/50 text-sm text-center mt-1">
+      A calm space for your emotional reflection.
+    </p>
+
+    <!-- Toggle -->
+    <div class="flex bg-black/30 rounded-full p-1 mt-6">
+      <a href="/login/"
+         class="flex-1 text-center py-2 rounded-full bg-black text-white text-sm font-semibold">
+        Login
+      </a>
+      <a href="/register/"
+         class="flex-1 text-center py-2 text-white/50 text-sm">
+        Register
+      </a>
+    </div>
+
+    <!-- Form -->
+    <form method="post" class="mt-6 space-y-4" action="{% url 'login' %}">
+      {% csrf_token %}
+
+      <input
+        type="email"
+        name="email"
+        placeholder="Email"
+        class="w-full px-4 py-3 rounded-full bg-black/40 border border-white/10 text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-purple-500"
+      />
+
+      <input
+        type="password"
+        name="password"
+        placeholder="Password"
+        class="w-full px-4 py-3 rounded-full bg-black/40 border border-white/10 text-white placeholder-white/30"
+      />
+
+      <div class="flex justify-between text-xs text-white/50">
+        <label class="flex items-center gap-2">
+          <input type="checkbox" class="accent-purple-500">
+          Remember for 30 days
+        </label>
+        <a href="{% url 'password_reset' %}" class="hover:text-white">Forgot password?</a>
+      </div>
+
+      <button
+        type="submit"
+        class="w-full py-3 rounded-full bg-purple-500 hover:bg-purple-600 text-white font-semibold transition">
+        Sign In
+      </button>
+    </form>
+
+    <!-- Divider -->
+    <div class="text-center text-white/30 text-xs my-6">OR CONTINUE WITH</div>
+
+    <!-- Google -->
+    <a href="{% provider_login_url 'google' %}"
+       class="w-full flex items-center justify-center gap-3 py-3 rounded-full bg-black/30 border border-white/10 text-white hover:bg-black/40">
+      <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-4">
+      Google
+    </a>
+
+    <!-- Footer -->
+    <p class="text-center text-white/40 text-sm mt-6">
+      Don’t have an account?
+      <a href="/register/" class="text-purple-400 hover:underline">Create one</a>
+    </p>
+
+    <a href="/guest/"
+   class="block text-center text-white/40 text-sm mt-4 hover:text-white">
+   Continue without an account
+</a>
+
+
+  </div>
+
+</body>
+</html>
