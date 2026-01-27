@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="en" class="light">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MoodMate | Your Daily Wellness Companion</title>
 
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- Material Symbols -->
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700" rel="stylesheet">
 
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
     <script>
         tailwind.config = {
             darkMode: "class",
@@ -25,122 +25,177 @@
                         "background-dark": "#101d22",
                     },
                     fontFamily: {
-                        display: ["Plus Jakarta Sans", "sans-serif"]
-                    },
-                    borderRadius: {
-                        DEFAULT: "1rem",
-                        lg: "2rem",
-                        xl: "3rem",
-                        full: "9999px"
+                        display: ["Plus Jakarta Sans", "sans-serif"],
                     },
                 },
             },
-        }
+        };
     </script>
 
     <style>
         body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            -webkit-font-smoothing: antialiased;
-        }
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            font-family: "Plus Jakarta Sans", sans-serif;
+            scroll-behavior: smooth;
         }
         .gradient-mesh {
-            background: radial-gradient(at 0% 0%, rgba(43, 189, 238, 0.15) 0%, transparent 50%),
-                        radial-gradient(at 100% 100%, rgba(159, 122, 234, 0.15) 0%, transparent 50%);
+            background:
+                radial-gradient(at 0% 0%, rgba(43,189,238,0.15) 0%, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(159,122,234,0.15) 0%, transparent 50%);
         }
     </style>
 </head>
 
-<body class="bg-background-light dark:bg-background-dark text-[#0d181b] dark:text-white transition-colors duration-300">
+<body class="bg-background-light text-[#0d181b]">
+
 <div class="flex flex-col min-h-screen">
 
-    <!-- Navbar -->
-    <header class="sticky top-0 z-50 flex items-center justify-between bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md p-4 border-b border-gray-200 dark:border-gray-800">
-        <div class="flex items-center gap-2">
-            <!-- Logo Icon -->
-            <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white">
-                <span class="material-symbols-outlined text-xl">self_care</span>
+    <!-- NAVBAR -->
+    <header class="sticky top-0 z-50 bg-background-light/80 backdrop-blur-md border-b border-gray-200">
+        <div class="max-w-7xl mx-auto flex items-center justify-between px-6 py-4 relative">
+
+            <!-- Left: Logo -->
+            <div class="flex items-center gap-2">
+                <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white">
+                    <span class="material-symbols-outlined">self_care</span>
+                </div>
+                <span class="font-bold text-lg">MoodMate</span>
             </div>
-            <h1 class="text-lg font-bold">MoodMate</h1>
+
+            <!-- Center: Links -->
+            <nav class="hidden md:flex gap-10 absolute left-1/2 -translate-x-1/2 font-semibold">
+                <a href="#home" class="hover:text-primary transition">Home</a>
+                <a href="#features" class="hover:text-primary transition">Features</a>
+            </nav>
+
+            <!-- Right: Actions -->
+            <div class="flex gap-3">
+                <button class="bg-primary text-white px-5 py-2 rounded-full font-semibold hover:bg-primary/90 transition">
+                    Get Started
+                </button>
+                <button class="border border-primary text-primary px-5 py-2 rounded-full font-semibold hover:bg-primary hover:text-white transition">
+                    Login
+                </button>
+            </div>
+
         </div>
-        <!-- Navbar Items -->
-        <nav class="flex items-center gap-4">
-            <a href="#" class="text-[#0d181b] dark:text-white font-medium hover:text-primary transition">Home</a>
-            <button class="bg-primary text-white px-4 py-1.5 rounded-full font-bold hover:bg-primary/90 transition">Get Started</button>
-            <button class="border border-primary text-primary px-4 py-1.5 rounded-full font-bold hover:bg-primary hover:text-white transition">Login</button>
-        </nav>
     </header>
 
-    <!-- Hero Section -->
-    <main class="flex-1 flex flex-col items-center justify-center text-center p-6 relative">
-        <div class="gradient-mesh rounded-xl p-6 border border-white dark:border-gray-800 relative overflow-hidden max-w-3xl w-full flex flex-col items-center gap-4">
-            <span class="bg-white/80 dark:bg-black/20 px-3 py-1 rounded-full text-xs font-bold text-primary uppercase">Your Mental Sanctuary</span>
-            <h1 class="text-4xl font-black leading-tight @[480px]:text-5xl">Check in with yourself. Every day.</h1>
-            <p class="text-[#4c869a] dark:text-gray-400 text-base">Your safe space for mental clarity, guided breathing, and mindful reflection.</p>
-            <button class="bg-primary text-white rounded-full px-8 py-4 font-bold shadow-lg mt-4 hover:bg-primary/90 transition">Start Your Journey</button>
-            <p class="text-xs text-[#4c869a] font-medium mt-2">Join 50,000+ users finding their calm</p>
+    <!-- HERO / HOME -->
+    <main id="home" class="flex-1 flex items-center justify-center p-6 text-center">
+        <div class="gradient-mesh max-w-3xl w-full rounded-2xl p-10 border border-white flex flex-col items-center gap-4">
+            <span class="bg-white/80 px-3 py-1 rounded-full text-xs font-bold text-primary uppercase">
+                Your Mental Sanctuary
+            </span>
+
+            <h1 class="text-4xl md:text-5xl font-black">
+                Check in with yourself. Every day.
+            </h1>
+
+            <p class="text-[#4c869a] max-w-xl">
+                Your safe space for mental clarity, guided breathing, and mindful reflection.
+            </p>
+
+            <button class="mt-4 bg-primary text-white px-8 py-4 rounded-full font-bold shadow-lg hover:bg-primary/90 transition">
+                Start Your Journey
+            </button>
         </div>
     </main>
 
-    <!-- Core Features Section -->
-    <section class="mt-12 px-4">
-        <h4 class="text-primary text-sm font-bold uppercase text-center tracking-wider">Core Features</h4>
+    <!-- FEATURES -->
+    <section id="features" class="mt-24 px-6 max-w-6xl mx-auto scroll-mt-32">
+        <h4 class="text-primary text-sm font-bold uppercase text-center">Core Features</h4>
         <div class="h-1 w-12 bg-primary/20 mx-auto rounded-full mt-2"></div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-            <!-- Feature Card -->
-            <div class="flex items-center gap-4 p-5 rounded-xl bg-white dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800 shadow-sm">
-                <div class="w-14 h-14 flex items-center justify-center rounded-full bg-primary/10 text-primary">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10">
+
+            <div class="flex gap-4 p-6 bg-white rounded-xl border shadow-sm">
+                <div class="w-14 h-14 bg-primary/10 text-primary flex items-center justify-center rounded-full">
                     <span class="material-symbols-outlined text-3xl">edit_note</span>
                 </div>
-                <div class="flex flex-col gap-1">
+                <div>
                     <h3 class="font-bold text-lg">Journaling</h3>
-                    <p class="text-sm text-[#4c869a] dark:text-gray-400">A private, encrypted space for your thoughts.</p>
+                    <p class="text-sm text-[#4c869a]">A private, encrypted space for your thoughts.</p>
                 </div>
             </div>
 
-            <div class="flex items-center gap-4 p-5 rounded-xl bg-white dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800 shadow-sm">
-                <div class="w-14 h-14 flex items-center justify-center rounded-full bg-lavender/10 text-lavender">
+            <div class="flex gap-4 p-6 bg-white rounded-xl border shadow-sm">
+                <div class="w-14 h-14 bg-lavender/10 text-lavender flex items-center justify-center rounded-full">
                     <span class="material-symbols-outlined text-3xl">air</span>
                 </div>
-                <div class="flex flex-col gap-1">
+                <div>
                     <h3 class="font-bold text-lg">Breathing</h3>
-                    <p class="text-sm text-[#4c869a] dark:text-gray-400">Guided rhythmic exercises for instant calm.</p>
+                    <p class="text-sm text-[#4c869a]">Guided rhythmic exercises for instant calm.</p>
                 </div>
             </div>
 
-            <div class="flex items-center gap-4 p-5 rounded-xl bg-white dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800 shadow-sm">
-                <div class="w-14 h-14 flex items-center justify-center rounded-full bg-primary/10 text-primary">
+            <div class="flex gap-4 p-6 bg-white rounded-xl border shadow-sm">
+                <div class="w-14 h-14 bg-primary/10 text-primary flex items-center justify-center rounded-full">
                     <span class="material-symbols-outlined text-3xl">forum</span>
                 </div>
-                <div class="flex flex-col gap-1">
+                <div>
                     <h3 class="font-bold text-lg">AI Companion</h3>
-                    <p class="text-sm text-[#4c869a] dark:text-gray-400">Empathetic support available 24/7.</p>
+                    <p class="text-sm text-[#4c869a]">Empathetic support available 24/7.</p>
                 </div>
             </div>
 
-            <div class="flex items-center gap-4 p-5 rounded-xl bg-white dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800 shadow-sm">
-                <div class="w-14 h-14 flex items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-500">
+            <div class="flex gap-4 p-6 bg-white rounded-xl border shadow-sm">
+                <div class="w-14 h-14 bg-emerald-100 text-emerald-500 flex items-center justify-center rounded-full">
                     <span class="material-symbols-outlined text-3xl">monitoring</span>
                 </div>
-                <div class="flex flex-col gap-1">
+                <div>
                     <h3 class="font-bold text-lg">Reflections</h3>
-                    <p class="text-sm text-[#4c869a] dark:text-gray-400">Understand and track your emotional trends.</p>
+                    <p class="text-sm text-[#4c869a]">Understand and track your emotional trends.</p>
                 </div>
             </div>
+
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="p-6 text-center border-t border-gray-100 dark:border-gray-800 mt-12">
-        <p class="text-xs text-[#4c869a] font-medium mb-4">Professional & Secure • HIPAA Compliant • 24/7 Support</p>
-        <div class="flex justify-center gap-6 mb-4">
-            <a href="#" class="text-primary font-bold text-sm">Privacy Policy</a>
-            <a href="#" class="text-primary font-bold text-sm">Terms of Service</a>
+    <!-- REVIEWS / TESTIMONIALS -->
+    <section class="mt-24 px-6 max-w-6xl mx-auto">
+        <h4 class="text-primary text-sm font-bold uppercase text-center">
+            Happy Users
+        </h4>
+        <div class="h-1 w-12 bg-primary/20 mx-auto rounded-full mt-2"></div>
+
+        {% if reviews %}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10">
+            {% for review in reviews %}
+            <div class="bg-white p-6 rounded-xl border shadow-sm">
+                <p class="text-[#4c869a] italic mb-4">“{{ review.text }}”</p>
+                <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-primary">groups</span>
+                    <div>
+                        <p class="font-semibold">{{ review.name }}</p>
+                        <p class="text-xs text-[#4c869a]">{{ review.role }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
         </div>
-        <p class="text-[10px] text-[#4c869a]">© 2024 MoodMate Wellness Inc. All rights reserved.</p>
+        {% else %}
+        <p class="text-center text-[#4c869a] mt-10">
+            No reviews yet. Be the first to share your experience 💙
+        </p>
+        {% endif %}
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="mt-24 bg-gradient-to-br from-primary/10 to-lavender/10 p-10 text-center">
+        <h3 class="text-xl font-black mb-2">MoodMate</h3>
+        <p class="text-sm text-[#4c869a] mb-6">
+            Your daily space for calm, clarity, and care 💙
+        </p>
+
+        <div class="flex justify-center gap-6 mb-6 font-semibold">
+            <a href="#" class="hover:text-primary">Privacy</a>
+            <a href="#" class="hover:text-primary">Terms</a>
+            <a href="#" class="hover:text-primary">Support</a>
+        </div>
+
+        <p class="text-xs text-[#4c869a]">
+            © 2026 MoodMate Wellness Inc. All rights reserved.
+        </p>
     </footer>
 
 </div>
