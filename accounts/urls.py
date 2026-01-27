@@ -4,7 +4,10 @@ from . import views
 
 urlpatterns = [
     path("register/", views.register_view, name="register"),
-    # path("dashboard/", views.dashboard, name="dashboard"),
+    path('login/', views.login_view, name='login'),
+    path('verify-otp/', views.verify_otp, name='verify_otp'),
+    path('resend-otp/', views.resend_otp, name='resend_otp'),
+    path("dashboard/", views.dashboard, name="dashboard"),
 ]
 
 

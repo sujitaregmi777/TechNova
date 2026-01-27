@@ -1,31 +1,60 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate,login
+from django.shortcuts import render, redirect,get_object_or_404
+from django.contrib.auth import login
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from .models import EmailOTP
 from django.contrib import messages
-from .forms import RegisterForm
+from .forms import CustomUserCreationForm
 import random,uuid
 from django.core.mail import send_mail
+from django.contrib.auth import authenticate
+from django.contrib.auth import login as auth_login
 from django.conf import settings
-from .models import LoginOTP
-# from .utils import generate_otp
-from django.contrib.auth.models import User
 
-def register_view(request):
+def register(request):
     if request.method == "POST":
-        form = RegisterForm(request.POST)
+        data = request.POST.copy()
+        email = data.get("email")
+
+        if email:
+            data["username"] = email
+
+        form = CustomUserCreationForm(data)
+        print("REGISTER VIEW HIT")
         if form.is_valid():
             user = form.save(commit=False)
-            user.username = user.email   
+
+            user.email = email
+            user.username = email
+
+            user.is_active = False
             user.save()
 
-            login(request, user)
-            return redirect("dashboard")
-        else:
-            for error in form.errors.values():
-                messages.error(request, error)
-    else:
-        form = RegisterForm()
+            otp = generate_otp()
+            EmailOTP.objects.create(user=user, otp=otp)
 
-    return render(request, "accounts/register.html")
+            
+
+            send_mail(
+                subject="Verify your Moodmate account",
+                message=f"Your OTP is {otp}",
+                from_email="no-reply@moodmate.com",
+                recipient_list=[user.email],
+            )
+
+            request.session["otp_user_id"] = user.id
+
+            messages.success(
+                request,
+                "We have sent a verification code to your email."
+            )
+
+            return redirect("verify_otp")
+
+    else:
+        form = CustomUserCreationForm()
+
+    return render(request, "accounts/register.html", {"form": form})
 
 def generate_otp():
     return str(random.randint(100000, 999999))
@@ -35,31 +64,27 @@ def login_view(request):
         email = request.POST.get("email")
         password = request.POST.get("password")
 
-        try:
-            user = User.objects.get(username=email)
-        except User.DoesNotExist:
-            messages.error(request, "Invalid credentials")
-            return redirect("login")
-
-        user = authenticate(request, username=email, password=password)
-
-        if not user:
-            messages.error(request, "Invalid credentials")
-            return redirect("login")
-
-        otp = generate_otp()
-        LoginOTP.objects.create(user=user, code=otp)
-
-        send_mail(
-            subject="MoodMate Login OTP",
-            message=f"Your OTP is {otp}. It expires in 5 minutes.",
-            from_email="no-reply@moodmate.local",
-            recipient_list=[user.email],
+        user = authenticate(
+            request,
+            username=email,
+            password=password
         )
 
-        request.session["otp_user_id"] = user.id
-        messages.success(request, "OTP sent to your email")
-        return redirect("verify_otp")
+        if user is None:
+            messages.error(request, "Invalid email or password.")
+            return render(request, "accounts/login.html")
+
+        if not user.is_active:
+            messages.error(
+                request,
+                "Your account is not verified. Please verify your email."
+            )
+            return render(request, "accounts/login.html")
+
+        auth_login(request, user)
+        print(request.POST)
+        messages.success(request, "Welcome back!")
+        return redirect("dashboard")  # must exist
 
     return render(request, "accounts/login.html")
 
@@ -69,27 +94,59 @@ def verify_otp(request):
     if not user_id:
         return redirect("login")
 
+    user = get_object_or_404(User, id=user_id)
+
     if request.method == "POST":
-        otp_input = request.POST.get("otp")
+        entered_otp = request.POST.get("otp")
 
-        otp_obj = LoginOTP.objects.filter(
-            user_id=user_id,
-            code=otp_input,
-            is_used=False
-        ).last()
+        try:
+            otp_obj = EmailOTP.objects.get(user=user)
+        except EmailOTP.DoesNotExist:
+            messages.error(request, "OTP expired or invalid.")
+            return redirect("register")
 
-        if not otp_obj or otp_obj.is_expired():
-            messages.error(request, "Invalid or expired OTP")
-            return redirect("verify_otp")
+        if entered_otp == otp_obj.otp:
+            otp_obj.delete()  
 
-        otp_obj.is_used = True
-        otp_obj.save()
+            user.is_active = True
+            user.save()
 
-        login(request, otp_obj.user)
-        del request.session["otp_user_id"]
+            del request.session["otp_user_id"]
+            auth_login(request, user)
 
-        return redirect("dashboard")
+            messages.success(request, "Email verified successfully!")
+            return redirect("dashboard")
+        else:
+            messages.error(request, "Invalid OTP. Try again.")
 
     return render(request, "accounts/verify_otp.html")
 
+def resend_otp(request):
+    user_id = request.session.get("otp_user_id")
 
+    if not user_id:
+        messages.error(request, "Session expired. Please register again.")
+        return redirect("register")
+
+    user = get_object_or_404(User, id=user_id)
+
+    # Delete old OTP if exists
+    EmailOTP.objects.filter(user=user).delete()
+
+    # Generate new OTP
+    otp = generate_otp()
+    EmailOTP.objects.create(user=user, otp=otp)
+
+    send_mail(
+        subject="Your new MoodMate verification code",
+        message=f"Your new OTP is {otp}",
+        from_email="no-reply@moodmate.com",
+        recipient_list=[user.email],
+    )
+
+    messages.success(request, "A new verification code has been sent to your email.")
+    return redirect("verify_otp")
+
+@login_required
+def dashboard(request):
+    return render (request, "accounts/dashboard.html")

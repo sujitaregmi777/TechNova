@@ -1,16 +1,24 @@
 from django import forms
-from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import get_user_model
 
-class RegisterForm(UserCreationForm):
+User = get_user_model()
+
+
+class CustomUserCreationForm(UserCreationForm):
     email = forms.EmailField(required=True)
 
     class Meta:
         model = User
-        fields = ("email", "password1", "password2")
+        fields = ("email", "username", "password1", "password2")
 
-    def clean_email(self):
-        email = self.cleaned_data.get("email")
-        if User.objects.filter(username=email).exists():
-            raise forms.ValidationError("An account with this email already exists.")
-        return email
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields["username"].widget = forms.HiddenInput()
+        self.fields["username"].required = False
+
+        for field in self.fields.values():
+            field.widget.attrs.update({
+                "class": "w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
+            })
