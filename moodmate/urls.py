@@ -16,14 +16,19 @@ Including another URLconf
 """
 from django.contrib import admin
 <<<<<<< HEAD
+<<<<<<< HEAD
 from django.urls import path, include
 =======
 from django.urls import path,include
 >>>>>>> origin/feature-moodmate
+=======
+from django.urls import path, include
+>>>>>>> de2008e (Journal Url)
 
 urlpatterns = [
 
     path('admin/', admin.site.urls),
+<<<<<<< HEAD
 <<<<<<< HEAD
     path('', include('accounts.urls')),
     path('', include('core.urls')),
@@ -34,4 +39,7 @@ urlpatterns = [
 
 
 >>>>>>> origin/feature-moodmate
+=======
+    path('', include('core.urls')),
+>>>>>>> de2008e (Journal Url)
 ]

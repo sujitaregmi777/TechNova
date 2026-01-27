@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 <<<<<<< HEAD
+<<<<<<< HEAD
     'accounts',
     'core',
 =======
@@ -50,6 +51,9 @@ INSTALLED_APPS = [
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
 >>>>>>> origin/feature-moodmate
+=======
+    'core',
+>>>>>>> de2008e (Journal Url)
 ]
 
 MIDDLEWARE = [
