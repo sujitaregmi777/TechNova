@@ -10,14 +10,6 @@ from .models import EmailOTP
 import random
 import uuid
 
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-<<<<<<< HEAD
-# Create your views here.
-def index(request):
-    return render(request, 'accounts/index.html')
-=======
-=======
 def register_view(request):
     if request.method == "POST":
         data = request.POST.copy()
@@ -62,12 +54,10 @@ def register_view(request):
         form = CustomUserCreationForm()
 
     return render(request, "accounts/register.html", {"form": form})
->>>>>>> 757674e (Add reflectcast input handlers)
 
 def generate_otp():
     return str(random.randint(100000, 999999))
 
-<<<<<<< HEAD
 
 def register(request):
     if request.method == "POST":
@@ -186,8 +176,6 @@ def resend_otp(request):
     return redirect("verify_otp")
 
 
-=======
->>>>>>> 757674e (Add reflectcast input handlers)
 def login_view(request):
     if request.method == "POST":
         email = request.POST.get("email")
@@ -204,7 +192,6 @@ def login_view(request):
             return render(request, "accounts/login.html")
 
         if not user.is_active:
-<<<<<<< HEAD
             messages.error(request, "Please verify your email first.")
             return redirect("verify_otp")
 
@@ -234,8 +221,6 @@ def guest_login(request):
     )
 
     return redirect("dashboard")
->>>>>>> origin/feature-moodmate
-=======
 def index(request):
     reviews = [
         {
@@ -258,20 +243,18 @@ def index(request):
     return render(request, "accounts/index.html", {
         "reviews": reviews
     })
->>>>>>> Stashed changes
-=======
-            messages.error(
-                request,
-                "Your account is not verified. Please verify your email."
-            )
-            return render(request, "accounts/login.html")
+    #         messages.error(
+    #             request,
+    #             "Your account is not verified. Please verify your email."
+    #         )
+    #         return render(request, "accounts/login.html")
 
-        auth_login(request, user)
-        print(request.POST)
-        messages.success(request, "Welcome back!")
-        return redirect("dashboard")  # must exist
+    #     auth_login(request, user)
+    #     print(request.POST)
+    #     messages.success(request, "Welcome back!")
+    #     return redirect("dashboard")  # must exist
 
-    return render(request, "accounts/login.html")
+    # return render(request, "accounts/login.html")
 
 def verify_otp(request):
     user_id = request.session.get("otp_user_id")
@@ -335,4 +318,3 @@ def resend_otp(request):
 @login_required
 def dashboard(request):
     return render (request, "accounts/dashboard.html")
->>>>>>> 757674e (Add reflectcast input handlers)
