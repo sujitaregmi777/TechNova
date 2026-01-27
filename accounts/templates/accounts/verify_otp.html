@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MoodMate · Verify OTP</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="min-h-screen pt-24 bg-gradient-to-br from-[#1a102f] via-[#12091f] to-[#0b0614] flex items-center justify-center">
+
+<!-- NAVBAR -->
+<header class="fixed top-0 left-0 w-full flex justify-between items-center px-8 py-4 text-white/70 backdrop-blur-md">
+  <div class="flex items-center gap-2 font-semibold text-white">
+    <span class="text-purple-400">◆</span> MoodMate
+  </div>
+
+  <nav class="flex gap-6 text-sm">
+    <a href="/about/" class="hover:text-white">About</a>
+    <a href="/privacy/" class="hover:text-white">Privacy</a>
+    <a href="/support/" class="hover:text-white">Support</a>
+  </nav>
+</header>
+
+<!-- CARD -->
+<div class="w-full max-w-md bg-[#2a0a4a]/90 backdrop-blur-xl rounded-2xl p-8 shadow-2xl border border-white/10">
+
+  <h1 class="text-white text-2xl font-bold text-center">Verify Your Email</h1>
+  <p class="text-white/50 text-sm text-center mt-2">
+    We’ve sent a 6-digit OTP to your email
+  </p>
+
+  <form method="post" class="mt-6 space-y-6">
+    {% csrf_token %}
+
+    <input type="text" name="otp" maxlength="6" required
+      placeholder="Enter OTP"
+      class="w-full text-center tracking-widest text-xl px-4 py-3 rounded-full bg-black/40 border border-white/10 text-white placeholder-white/40">
+
+    <button type="submit"
+      class="w-full py-3 rounded-full bg-purple-500 hover:bg-purple-600 text-white font-semibold transition">
+      Verify & Continue
+    </button>
+  </form>
+
+  <div class="text-center text-white/40 text-sm mt-6">
+    Didn’t receive OTP?
+    <a href="/resend-otp/" class="text-purple-400 hover:underline">Resend</a>
+  </div>
+
+</div>
+</body>
+</html>
