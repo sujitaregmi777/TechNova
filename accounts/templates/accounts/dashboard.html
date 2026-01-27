@@ -178,7 +178,6 @@
 
 </div>
 
-<!-- JS -->
 <script>
 function setMood(mood) {
   const moodMap = {
@@ -192,7 +191,7 @@ function setMood(mood) {
   document.getElementById("moodText").innerText =
     "Current state: " + moodMap[mood].text;
 
-  fetch("", {
+  fetch("{% url 'set_mood' %}", {
     method: "POST",
     headers: {
       "X-CSRFToken": "{{ csrf_token }}",
@@ -200,9 +199,7 @@ function setMood(mood) {
     },
     body: JSON.stringify({ mood }),
   }).then(() => {
-    setTimeout(() => {
-      window.location.href = "";
-    }, 400);
+    window.location.reload();
   });
 }
 </script>

@@ -1,40 +1,39 @@
 import os
-import uuid
+import pickle
 from datetime import datetime
-import chromadb
-from chromadb.config import Settings
-from sentence_transformers import SentenceTransformer
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
-# Initialize embedding model
-model = SentenceTransformer("all-MiniLM-L6-v2")
-
-class LocalEmbeddingFunction:
-    def __call__(self, input):
-        if isinstance(input, str):
-            input = [input]
-        return model.encode(input).tolist()
-
-    def name(self):
-        return "local-sentence-transformer"
-
-# Persistent Chroma client
-chroma_client = chromadb.PersistentClient(
-    path="./chroma_data",
-    settings=Settings(allow_reset=True)
-)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+STORE_DIR = os.path.join(BASE_DIR, "tfidf_store")
+os.makedirs(STORE_DIR, exist_ok=True)
 
 # ---------------------------
-# Helper: get per-user collection
+# Helpers to load/save per user store
 # ---------------------------
-def get_user_collection(user_id):
-    return chroma_client.get_or_create_collection(
-        name=f"reflectcast_user_{user_id}",
-        embedding_function=LocalEmbeddingFunction()
-    )
+
+def _get_user_store_path(user_id):
+    return os.path.join(STORE_DIR, f"user_{user_id}.pkl")
+
+def _load_user_store(user_id):
+    path = _get_user_store_path(user_id)
+    if os.path.exists(path):
+        with open(path, "rb") as f:
+            return pickle.load(f)
+    return {
+        "documents": [],
+        "metadatas": []
+    }
+
+def _save_user_store(user_id, data):
+    path = _get_user_store_path(user_id)
+    with open(path, "wb") as f:
+        pickle.dump(data, f)
 
 # ---------------------------
 # Text chunking
 # ---------------------------
+
 def chunk_text(text, max_tokens=450):
     sentences = text.split(". ")
     chunks = []
@@ -59,48 +58,53 @@ def chunk_text(text, max_tokens=450):
 # ---------------------------
 # Store reflection
 # ---------------------------
+
 def add_reflection(user_id, reflection_text, mood, outcome=None, theme=None, episode_script=None):
-    collection = get_user_collection(user_id)
+    store = _load_user_store(user_id)
     chunks = chunk_text(reflection_text)
     today = datetime.now().strftime("%Y-%m-%d")
 
     for i, chunk in enumerate(chunks):
-        try:
-            collection.add(
-                documents=[chunk],
-                metadatas=[{
-                    "mood": mood,
-                    "date": today,
-                    "theme": theme or "general",
-                    "outcome": outcome or "unknown",
-                    "episode_script": episode_script or "",
-                    "chunk_index": i
-                }],
-                ids=[str(uuid.uuid4())]
-            )
-        except Exception as e:
-            print(f"Error adding reflection chunk: {e}")
-
-# ---------------------------
-# Retrieve similar reflections (per user)
-# ---------------------------
-def get_similar_reflections(query_text, user_id, top_k=5):
-    collection = get_user_collection(user_id)
-
-    try:
-        results = collection.query(
-            query_texts=[query_text],
-            n_results=top_k
-        )
-    except Exception as e:
-        print(f"Error querying vector store: {e}")
-        return []
-
-    docs = []
-    for i in range(len(results["documents"][0])):
-        docs.append({
-            "document": results["documents"][0][i],
-            "metadata": results["metadatas"][0][i]
+        store["documents"].append(chunk)
+        store["metadatas"].append({
+            "mood": mood,
+            "date": today,
+            "theme": theme or "general",
+            "outcome": outcome or "unknown",
+            "episode_script": episode_script or "",
+            "chunk_index": i
         })
 
-    return docs
+    _save_user_store(user_id, store)
+
+# ---------------------------
+# Retrieve similar reflections
+# ---------------------------
+
+def get_similar_reflections(query_text, user_id, top_k=5):
+    store = _load_user_store(user_id)
+
+    documents = store["documents"]
+    metadatas = store["metadatas"]
+
+    if not documents:
+        return []
+
+    vectorizer = TfidfVectorizer(stop_words="english")
+    tfidf_matrix = vectorizer.fit_transform(documents + [query_text])
+
+    cosine_sim = cosine_similarity(
+        tfidf_matrix[-1],
+        tfidf_matrix[:-1]
+    )[0]
+
+    top_indices = cosine_sim.argsort()[-top_k:][::-1]
+
+    results = []
+    for idx in top_indices:
+        results.append({
+            "document": documents[idx],
+            "metadata": metadatas[idx]
+        })
+
+    return results

@@ -43,6 +43,7 @@ urlpatterns = [
         name="password_reset_complete"
     ),
     path("set-mood/", views.set_mood, name="set_mood"),
+    path("breathing/", views.breathing, name="breathing")
 ]
 
 

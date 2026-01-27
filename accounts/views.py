@@ -10,6 +10,7 @@ from .models import EmailOTP
 import random,uuid
 import json
 from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 
 def generate_otp():
     return str(random.randint(100000, 999999))
@@ -158,10 +159,6 @@ def login_view(request):
     return render(request, "accounts/login.html")
 
 
-@login_required
-def dashboard(request):
-    return render(request, "accounts/dashboard.html")
-
 
 def guest_login(request):
     username = f"guest_{uuid.uuid4().hex[:10]}"
@@ -177,6 +174,11 @@ def guest_login(request):
     )
 
     return redirect("dashboard")
+
+@login_required
+def dashboard(request):
+    return render (request, "accounts/dashboard.html")
+
 def index(request):
     reviews = [
         {
@@ -222,11 +224,20 @@ def verify_otp(request):
     user = get_object_or_404(User, id=user_id)
 
 
+
+@csrf_exempt
+@login_required
 def set_mood(request):
     if request.method == "POST":
         data = json.loads(request.body)
         request.session["current_mood"] = data.get("mood")
         return JsonResponse({"status": "ok"})
+
+    return JsonResponse({"status": "invalid"}, status=400)
+    
+
+def breathing(request):
+    return render(request, "accounts/breathing.html")
 
 
 
