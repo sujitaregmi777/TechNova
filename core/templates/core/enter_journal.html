@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<body>          
+<h2>Enter New Journal</h2>
+<form method="post">
+    {% csrf_token %}
+    <label for="title">edit Journal</label><br>
+    <input type="text" id="title" name="title" value="{{ journal.title|default:'' }}" required><br><br>
+    
+    <label for="content">Content:</label><br>
+    <textarea id="content" name="content" rows="10" cols="50" required>{{ journal.content|default:'' }}</textarea><br><br>
+    
+    <input type="submit" value="Save Journal">
+</form>
+</body>

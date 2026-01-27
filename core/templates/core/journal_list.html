@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>My Journals</h2>
+
+<a href="{% url 'enter_journal' %}">+ New Journal</a>
+<hr>
+
+{% for j in journals %}
+  <div style="margin-bottom:15px;">
+      <b>{{ j.title }}</b> 
+      ({{ j.created_at|date:"d-m-Y" }})
+      {% if j.is_favorite %} ❤️ {% endif %}
+      <br>
+
+      {{ j.content|truncatechars:100 }} <br>
+
+      <a href="{% url 'edit_journal' j.id %}">Edit</a> |
+      <a href="{% url 'toggle_favorite' j.id %}">Fav</a> |
+      <a href="{% url 'delete_journal' j.id %}">Delete</a>
+  </div>
+{% empty %}
+  <p>No journals yet.</p>
+{% endfor %}
+
+</body>
+</html>
