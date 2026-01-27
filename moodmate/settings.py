@@ -38,22 +38,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-<<<<<<< HEAD
-<<<<<<< HEAD
+    "django.contrib.sites",
     'accounts',
     'core',
-=======
-     "django.contrib.sites",
-     'accounts',
-     'core',
-     "allauth",
+    "allauth",
     "allauth.account",
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
->>>>>>> origin/feature-moodmate
-=======
-    'core',
->>>>>>> de2008e (Journal Url)
 ]
 
 MIDDLEWARE = [
@@ -172,4 +163,5 @@ DEFAULT_FROM_EMAIL = "RoomSiftay <roomsiftay@gmail.com>"
 
 SESSION_COOKIE_AGE = 1209600  
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+
 
