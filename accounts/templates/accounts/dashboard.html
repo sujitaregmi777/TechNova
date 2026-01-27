@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+{% block title %}Dashboard · MoodMate{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto flex flex-col gap-10">
+
+  <!-- GREETING -->
+  <section>
+    <h1 class="text-3xl sm:text-4xl font-bold">
+      {% if user.is_authenticated %}
+        Welcome back{% if user.first_name %}, {{ user.first_name }}{% endif %}
+      {% else %}
+        Welcome 🌱
+      {% endif %}
+    </h1>
+    <p class="text-[var(--muted)] mt-2">
+      Take a moment. There’s no rush here.
+    </p>
+  </section>
+
+  <!-- MOOD SELECTOR -->
+  <section
+    class="rounded-3xl p-6 bg-[var(--surface)]
+           border border-[var(--border)]
+           flex flex-col gap-5">
+
+    <h2 class="text-lg font-semibold">
+      How are you feeling right now?
+    </h2>
+
+    <!-- Emoji buttons -->
+    <div class="flex justify-between items-center px-2">
+
+      <button type="button" onclick="setMood('sad')"
+        class="group flex flex-col items-center gap-2 cursor-pointer">
+        <span class="text-3xl group-hover:scale-110 transition">😔</span>
+        <span class="text-[10px] font-bold text-[var(--muted)] uppercase">Sad</span>
+      </button>
+
+      <button type="button" onclick="setMood('anxious')"
+        class="group flex flex-col items-center gap-2 cursor-pointer">
+        <span class="text-3xl group-hover:scale-110 transition">😐</span>
+        <span class="text-[10px] font-bold text-[var(--muted)] uppercase">Anxious</span>
+      </button>
+
+      <button type="button" onclick="setMood('happy')"
+        class="group flex flex-col items-center gap-2 cursor-pointer">
+        <span class="text-3xl group-hover:scale-110 transition">😊</span>
+        <span class="text-[10px] font-bold text-[var(--primary)] uppercase">Happy</span>
+      </button>
+
+      <button type="button" onclick="setMood('grateful')"
+        class="group flex flex-col items-center gap-2 cursor-pointer">
+        <span class="text-3xl group-hover:scale-110 transition">🤩</span>
+        <span class="text-[10px] font-bold text-[var(--muted)] uppercase">Grateful</span>
+      </button>
+
+    </div>
+
+    <!-- Progress bar -->
+    <div class="w-full h-3 rounded-full bg-[var(--surface-alt)] overflow-hidden">
+      <div id="moodBar"
+           class="h-full w-[50%] bg-[var(--primary)] transition-all duration-500">
+      </div>
+    </div>
+
+    <p id="moodText" class="text-sm text-[var(--muted)] text-center">
+      Current state: steady and present
+    </p>
+  </section>
+
+  <!-- RECENT PRESENCE -->
+  <section class="rounded-3xl p-6 bg-[var(--surface)]
+                 border border-[var(--border)] flex flex-col gap-2">
+    <h3 class="text-base font-semibold">Your recent presence</h3>
+    <p class="text-sm text-[var(--muted)]">
+      {% if user.is_authenticated %}
+        You’ve checked in a few times recently. That consistency matters.
+      {% else %}
+        You’ve returned here before. That’s enough for today.
+      {% endif %}
+    </p>
+
+    <div class="flex gap-2 mt-2">
+      <span class="px-3 py-1 rounded-full text-xs
+                   bg-[var(--primary)]/10 text-[var(--primary)]">
+        Checked in this week
+      </span>
+      <span class="px-3 py-1 rounded-full text-xs
+                   bg-[var(--primary)]/10 text-[var(--primary)]">
+        Building a gentle rhythm
+      </span>
+    </div>
+  </section>
+
+  <!-- LATEST REFLECTION -->
+  <section class="rounded-3xl p-6 bg-[var(--surface)]
+                 border border-[var(--border)] flex flex-col gap-3">
+    <h3 class="text-base font-semibold">Your latest reflection</h3>
+
+    {% if latest_reflection %}
+      <p class="text-sm italic">
+        “{{ latest_reflection.content|truncatechars:120 }}”
+      </p>
+      <p class="text-xs text-[var(--muted)]">
+        {{ latest_reflection.created_at|timesince }} ago
+      </p>
+      <a href="{% url 'journal_edit' latest_reflection.id %}"
+         class="text-sm font-medium text-[var(--primary)] hover:underline">
+        Continue this reflection →
+      </a>
+    {% else %}
+      <p class="text-sm text-[var(--muted)]">
+        You haven’t written anything yet.
+      </p>
+      <a href=""
+         class="text-sm font-medium text-[var(--primary)] hover:underline">
+        Start with one sentence →
+      </a>
+    {% endif %}
+  </section>
+
+  <!-- QUICK ACTIONS -->
+  <section class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+
+    <a href=""
+       class="rounded-3xl p-6 bg-[var(--surface)]
+              border border-[var(--border)]
+              hover:border-[var(--primary)] transition">
+      <h4 class="font-semibold">Write a reflection</h4>
+      <p class="text-sm text-[var(--muted)] mt-1">
+        Let your thoughts settle on the page.
+      </p>
+    </a>
+
+    <a href="/chat/"
+       class="rounded-3xl p-6 bg-[var(--surface)]
+              border border-[var(--border)]
+              hover:border-[var(--primary)] transition">
+      <h4 class="font-semibold">Talk it out</h4>
+      <p class="text-sm text-[var(--muted)] mt-1">
+        A calm conversation, without judgment.
+      </p>
+    </a>
+
+  </section>
+
+  <!-- BREATHING CTA -->
+  <section
+    class="rounded-3xl p-6 bg-[var(--surface-alt)]
+           border border-[var(--border)]
+           flex flex-col sm:flex-row
+           sm:items-center sm:justify-between gap-4">
+
+    <div>
+      <h4 class="font-semibold">Need a quiet reset?</h4>
+      <p class="text-sm text-[var(--muted)]">
+        A short breathing session can help your body slow down.
+      </p>
+    </div>
+
+    <a href=""
+       class="px-6 py-3 rounded-xl bg-white text-black font-medium">
+      Start breathing
+    </a>
+  </section>
+
+  <!-- ANONYMOUS NOTICE -->
+  {% if not user.is_authenticated %}
+    <p class="text-xs text-center text-[var(--muted)]">
+      Your reflections are saved on this device.
+      <a href="{% url 'register' %}" class="text-[var(--primary)] hover:underline">
+        Create an account
+      </a>
+      to keep them safe everywhere.
+    </p>
+  {% endif %}
+
+</div>
+
+<!-- JS -->
+<script>
+function setMood(mood) {
+  const moodMap = {
+    sad: { width: "25%", text: "feeling low" },
+    anxious: { width: "40%", text: "a bit anxious" },
+    happy: { width: "70%", text: "feeling good" },
+    grateful: { width: "85%", text: "feeling grateful" },
+  };
+
+  document.getElementById("moodBar").style.width = moodMap[mood].width;
+  document.getElementById("moodText").innerText =
+    "Current state: " + moodMap[mood].text;
+
+  fetch("", {
+    method: "POST",
+    headers: {
+      "X-CSRFToken": "{{ csrf_token }}",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ mood }),
+  }).then(() => {
+    setTimeout(() => {
+      window.location.href = "";
+    }, 400);
+  });
+}
+</script>
+{% endblock %}
