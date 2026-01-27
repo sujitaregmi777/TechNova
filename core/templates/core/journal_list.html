@@ -1,28 +1,91 @@
-<!DOCTYPE html>
-<html>
-<body>
+{% extends "base.html" %}
+{% block title %}My Journal · MoodMate{% endblock %}
 
-<h2>My Journals</h2>
+{% block content %}
+<div class="max-w-4xl mx-auto flex flex-col gap-10">
 
-<a href="{% url 'enter_journal' %}">+ New Journal</a>
-<hr>
+  <!-- Header -->
+  <section class="flex items-center justify-between">
+    <div>
+      <h1 class="text-3xl sm:text-4xl font-bold">
+        My journal
+      </h1>
+      <p class="text-[var(--muted)] mt-2">
+        A collection of moments you chose to notice.
+      </p>
+    </div>
 
-{% for j in journals %}
-  <div style="margin-bottom:15px;">
-      <b>{{ j.title }}</b> 
-      ({{ j.created_at|date:"d-m-Y" }})
-      {% if j.is_favorite %} ❤️ {% endif %}
-      <br>
+    <a href="{% url 'journal_create' %}"
+       class="flex items-center gap-2 px-5 py-2.5
+              bg-[var(--primary)] text-white rounded-xl">
+      <span class="material-symbols-outlined">add</span>
+      New reflection
+    </a>
+  </section>
 
-      {{ j.content|truncatechars:100 }} <br>
+  {% if journals %}
+    <section class="flex flex-col gap-4">
+      {% for journal in journals %}
+        <div
+          class="rounded-3xl p-6
+                 bg-[var(--surface)]
+                 border border-[var(--border)]
+                 flex justify-between gap-6">
 
-      <a href="{% url 'edit_journal' j.id %}">Edit</a> |
-      <a href="{% url 'toggle_favorite' j.id %}">Fav</a> |
-      <a href="{% url 'delete_journal' j.id %}">Delete</a>
-  </div>
-{% empty %}
-  <p>No journals yet.</p>
-{% endfor %}
+          <div class="flex flex-col gap-1">
+            <h3 class="font-semibold text-lg">
+              {{ journal.title|default:"Untitled reflection" }}
+            </h3>
 
-</body>
-</html>
+            <p class="text-sm text-[var(--muted)] flex flex-wrap items-center gap-2">
+              {{ journal.get_mood_display }}
+              <span class="opacity-50">•</span>
+              {{ journal.created_at|date:"M d, Y" }}
+            </p>
+          </div>
+
+          <div class="flex gap-1">
+            <a href="{% url 'journal_edit' journal.id %}"
+               class="p-2 rounded-xl hover:bg-[var(--surface-alt)]"
+               title="Edit reflection">
+              <span class="material-symbols-outlined text-[var(--muted)]">
+                edit
+              </span>
+            </a>
+
+            <a href="{% url 'journal_delete' journal.id %}"
+               class="p-2 rounded-xl hover:bg-[var(--surface-alt)]"
+               title="Delete reflection">
+              <span class="material-symbols-outlined text-[var(--muted)]">
+                delete
+              </span>
+            </a>
+          </div>
+
+        </div>
+      {% endfor %}
+    </section>
+
+  {% else %}
+    <section class="mt-32 text-center flex flex-col items-center gap-3">
+      <span class="material-symbols-outlined text-6xl text-[var(--muted)]">
+        auto_stories
+      </span>
+
+      <p class="text-xl font-medium">
+        No reflections yet
+      </p>
+
+      <p class="text-sm text-[var(--muted)] max-w-sm">
+        When you write something, it will quietly live here.
+      </p>
+
+      <a href="{% url 'journal_create' %}"
+         class="mt-2 text-sm font-medium text-[var(--primary)] hover:underline">
+        Start with one sentence →
+      </a>
+    </section>
+  {% endif %}
+
+</div>
+{% endblock %}

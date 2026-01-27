@@ -5,20 +5,24 @@ __pycache__/
 # VS Code settings
 .vscode/
 
-# Virtual environment
+# Virtual environments
 env310/
 venv/
+
+# Environment variables
 .env
 .env.*
 
 # Django database
 db.sqlite3
 
-# Django migrations (optional to ignore)
-*/migrations/*.pyc
+# Django migration cache only (keep migration .py files!)
 */migrations/__pycache__/
-*/migrations/*.py
+*/migrations/*.pyc
 
-# MacOS / Windows system files
+# Backup folders
+backup_untracked/
+
+# OS files
 .DS_Store
 Thumbs.db
