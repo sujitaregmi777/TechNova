@@ -5,7 +5,7 @@
 
 <style>
   .mode-btn {
-    padding: 0.5rem 1.5rem;
+    padding: 0.5rem 1.25rem;
     border-radius: 9999px;
     background: var(--surface-alt);
     color: var(--text);
@@ -19,99 +19,115 @@
   }
 </style>
 
-<div class="max-w-4xl mx-auto flex flex-col gap-12">
+<div class="max-w-6xl mx-auto flex flex-col gap-14">
 
-  <!-- INTRO -->
+  <!-- PAGE INTRO -->
   <section class="text-center">
-    <h1 class="text-4xl sm:text-5xl font-bold tracking-tight">
-      Take a slow breath.
+    <h1 class="text-4xl sm:text-5xl font-bold">
+      Pause. Breathe. Reset.
     </h1>
-    <p class="mt-4 text-[var(--muted)] max-w-xl mx-auto text-lg">
-      There’s nothing to fix. Just be here for a moment.
+    <p class="mt-4 text-lg text-[var(--muted)] max-w-2xl mx-auto">
+      A short breathing exercise can help your body slow down.
+      You’re always in control.
     </p>
   </section>
 
-  <!-- MODES -->
-  <section class="flex gap-3 justify-center overflow-x-auto pb-2">
+  <!-- BREATHING MODES -->
+  <section class="flex justify-center gap-3 flex-wrap">
     <button class="mode-btn active" onclick="selectMode('478', this)">4-7-8 Calm</button>
     <button class="mode-btn" onclick="selectMode('box', this)">Box</button>
     <button class="mode-btn" onclick="selectMode('equal', this)">Equal</button>
     <button class="mode-btn" onclick="selectMode('gentle', this)">Gentle Reset</button>
   </section>
 
-  <!-- CORE -->
-  <section
-    class="relative rounded-3xl bg-[var(--surface)] border border-[var(--border)]
-           p-10 sm:p-14 flex flex-col items-center gap-10 overflow-hidden">
+  <!-- TWO BOX LAYOUT -->
+  <section class="grid grid-cols-1 md:grid-cols-2 gap-8">
 
-    <!-- Glow -->
-    <div class="absolute -top-24 -right-24 w-72 h-72 bg-[var(--primary)]/10 rounded-full blur-[80px]"></div>
-    <div class="absolute -bottom-24 -left-24 w-72 h-72 bg-blue-500/10 rounded-full blur-[80px]"></div>
+    <!-- LEFT BOX -->
+    <div class="rounded-3xl bg-[var(--surface)]
+                border border-[var(--border)]
+                p-10 flex flex-col items-center gap-6">
 
-    <p id="breathText"
-       class="relative z-10 text-sm uppercase tracking-[0.3em]
-              text-[var(--primary)] font-semibold">
-      Inhale…
-    </p>
-
-    <!-- Breathing Circle -->
-    <div class="relative z-10 flex items-center justify-center">
-      <div class="absolute w-72 h-72 rounded-full border border-[var(--primary)]/20 animate-pulse"></div>
-      <div class="absolute w-52 h-52 rounded-full border border-[var(--primary)]/30"></div>
+      <p id="breathText"
+         class="uppercase tracking-[0.3em] text-sm
+                text-[var(--primary)] font-semibold">
+        Ready
+      </p>
 
       <div id="breathingCircle"
-        class="w-36 h-36 rounded-full bg-gradient-to-br from-[var(--primary)] to-indigo-500
-               shadow-[0_0_60px_rgba(166,128,255,0.35)]
-               flex items-center justify-center
-               transition-transform duration-1000">
-        <span class="material-symbols-outlined text-white text-5xl opacity-90">
+           class="w-44 h-44 rounded-full
+                  bg-gradient-to-br from-[var(--primary)] to-indigo-500
+                  shadow-[0_0_60px_rgba(166,128,255,0.35)]
+                  flex items-center justify-center
+                  transition-transform duration-1000">
+        <span class="material-symbols-outlined text-white text-6xl">
           spa
         </span>
       </div>
+
+      <p class="text-sm text-[var(--muted)] text-center">
+        Follow the rhythm shown above.
+      </p>
     </div>
 
-    <!-- Controls -->
-    <div class="relative z-10 flex gap-4">
-      <button onclick="startBreathing()"
-        class="px-6 py-3 rounded-xl bg-[var(--primary)] text-black font-semibold">
-        Start
-      </button>
+    <!-- RIGHT BOX -->
+    <div class="rounded-3xl bg-[var(--surface)]
+                border border-[var(--border)]
+                p-10 flex flex-col justify-between gap-8">
 
-      <button onclick="stopBreathing()"
-        class="px-6 py-3 rounded-xl bg-[var(--surface-alt)] border border-[var(--border)]">
-        Stop / Reset
-      </button>
+      <div>
+        <h3 class="text-xl font-semibold mb-2">
+          Breathing session
+        </h3>
+        <p class="text-sm text-[var(--muted)]">
+          Choose a pattern and press start.
+          You can stop or reset anytime.
+        </p>
+      </div>
+
+      <div class="flex gap-4">
+        <button id="startBtn"
+          onclick="startBreathing()"
+          class="flex-1 px-6 py-3 rounded-xl
+                 bg-[var(--primary)] text-black font-semibold">
+          Start
+        </button>
+
+        <button id="stopBtn"
+          onclick="stopBreathing()"
+          disabled
+          class="flex-1 px-6 py-3 rounded-xl
+                 bg-[var(--surface-alt)]
+                 border border-[var(--border)]
+                 opacity-50 cursor-not-allowed">
+          Stop
+        </button>
+      </div>
+
+      <p class="text-xs text-[var(--muted)]">
+        If your thoughts wander, gently return to the breath.
+      </p>
     </div>
-
-    <p class="relative z-10 text-sm text-[var(--muted)] text-center max-w-md">
-      If your thoughts wander, gently return to the breath.
-    </p>
 
   </section>
 
-  <!-- HOW DO YOU FEEL -->
+  <!-- AFTER SESSION -->
   <section id="postPrompt"
     class="hidden rounded-3xl p-8 bg-[var(--surface-alt)]
            border border-[var(--border)] text-center">
 
     <h3 class="text-xl font-semibold mb-2">
-      How do you feel right now?
+      How do you feel now?
     </h3>
 
     <p class="text-sm text-[var(--muted)] mb-4">
-      There’s no right answer.
+      There’s no right or wrong answer.
     </p>
 
-    <div class="flex flex-wrap justify-center gap-3">
-      <span class="px-4 py-2 rounded-full bg-[var(--primary)]/10 text-[var(--primary)] text-sm">
-        Calmer
-      </span>
-      <span class="px-4 py-2 rounded-full bg-[var(--primary)]/10 text-[var(--primary)] text-sm">
-        About the same
-      </span>
-      <span class="px-4 py-2 rounded-full bg-[var(--primary)]/10 text-[var(--primary)] text-sm">
-        Still tense
-      </span>
+    <div class="flex justify-center gap-3 flex-wrap">
+      <span class="px-4 py-2 rounded-full bg-[var(--primary)]/10 text-[var(--primary)] text-sm">Calmer</span>
+      <span class="px-4 py-2 rounded-full bg-[var(--primary)]/10 text-[var(--primary)] text-sm">About the same</span>
+      <span class="px-4 py-2 rounded-full bg-[var(--primary)]/10 text-[var(--primary)] text-sm">Still tense</span>
     </div>
 
     <a href="/journal/"
@@ -120,64 +136,58 @@
     </a>
   </section>
 
-<!-- Professional Support (Nepal) -->
-<section
-  class="mt-8 rounded-3xl border border-[var(--border)]
-         bg-[var(--surface-alt)] p-8
-         flex flex-col md:flex-row items-center
-         justify-between gap-8">
+  <!-- PROFESSIONAL SUPPORT (NEPAL) -->
+  <section
+    class="rounded-3xl border border-[var(--border)]
+           bg-[var(--surface-alt)] p-8
+           flex flex-col md:flex-row
+           items-center justify-between gap-8">
 
-  <!-- Text -->
-  <div class="max-w-xl">
-    <h3 class="text-xl font-semibold mb-2">
-      Professional support in Nepal
-    </h3>
-    <p class="text-sm text-[var(--muted)] leading-relaxed">
-      If you’re feeling overwhelmed or need to talk to someone,
-      trusted mental health support is available within Nepal.
-      You’re not alone in this.
-    </p>
-  </div>
+    <div class="max-w-xl">
+      <h3 class="text-xl font-semibold mb-2">
+        Professional support in Nepal
+      </h3>
+      <p class="text-sm text-[var(--muted)] leading-relaxed">
+        If you’re feeling overwhelmed or need to talk to someone,
+        trusted mental health support is available within Nepal.
+        You’re not alone in this.
+      </p>
+    </div>
 
-  <!-- Actions -->
-  <div class="flex flex-wrap gap-3 justify-center md:justify-end">
+    <div class="flex flex-wrap gap-3 justify-center md:justify-end">
 
-    <!-- Emergency -->
-    <a href="tel:100"
-       class="flex items-center gap-2 px-6 py-3 rounded-xl
-              bg-red-500/10 text-red-600
-              hover:bg-red-500 hover:text-white
-              transition-all font-semibold text-sm">
-      <span class="material-symbols-outlined text-[20px]">call</span>
-      Emergency (100)
-    </a>
+      <!-- Emergency -->
+      <a href="tel:100"
+         class="flex items-center gap-2 px-6 py-3 rounded-xl
+                bg-red-500/10 text-red-600
+                hover:bg-red-500 hover:text-white
+                transition-all font-semibold text-sm">
+        <span class="material-symbols-outlined">call</span>
+        Emergency (100)
+      </a>
 
-    <!-- TPO Nepal -->
-    <a href="https://tponepal.org"
-       target="_blank"
-       class="flex items-center gap-2 px-6 py-3 rounded-xl
-              bg-[var(--surface)] border border-[var(--border)]
-              hover:border-[var(--primary)] transition-all
-              font-semibold text-sm">
-      <span class="material-symbols-outlined text-[20px]">psychology</span>
-      TPO Nepal
-    </a>
+      <!-- TPO Nepal -->
+      <a href="https://tponepal.org" target="_blank"
+         class="flex items-center gap-2 px-6 py-3 rounded-xl
+                bg-[var(--surface)] border border-[var(--border)]
+                hover:border-[var(--primary)] transition-all
+                font-semibold text-sm">
+        <span class="material-symbols-outlined">psychology</span>
+        TPO Nepal
+      </a>
 
-    <!-- KOSHISH Nepal -->
-    <a href="https://koshishnepal.org"
-       target="_blank"
-       class="flex items-center gap-2 px-6 py-3 rounded-xl
-              bg-[var(--surface)] border border-[var(--border)]
-              hover:border-[var(--primary)] transition-all
-              font-semibold text-sm">
-      <span class="material-symbols-outlined text-[20px]">diversity_3</span>
-      KOSHISH Nepal
-    </a>
+      <!-- KOSHISH Nepal -->
+      <a href="https://koshishnepal.org" target="_blank"
+         class="flex items-center gap-2 px-6 py-3 rounded-xl
+                bg-[var(--surface)] border border-[var(--border)]
+                hover:border-[var(--primary)] transition-all
+                font-semibold text-sm">
+        <span class="material-symbols-outlined">diversity_3</span>
+        KOSHISH Nepal
+      </a>
 
-  </div>
-</section>
-
-
+    </div>
+  </section>
 
 </div>
 
@@ -188,27 +198,28 @@
 
   const modes = {
     "478": [
-      { text: "Inhale…", scale: 1.3, duration: 4000 },
-      { text: "Hold…", scale: 1.3, duration: 7000 },
-      { text: "Exhale…", scale: 1.0, duration: 8000 },
+      { text: "Inhale", scale: 1.3, duration: 4000 },
+      { text: "Hold", scale: 1.3, duration: 7000 },
+      { text: "Exhale", scale: 1.0, duration: 8000 },
     ],
     "box": [
-      { text: "Inhale…", scale: 1.3, duration: 4000 },
-      { text: "Hold…", scale: 1.3, duration: 4000 },
-      { text: "Exhale…", scale: 1.0, duration: 4000 },
-      { text: "Hold…", scale: 1.0, duration: 4000 },
+      { text: "Inhale", scale: 1.3, duration: 4000 },
+      { text: "Hold", scale: 1.3, duration: 4000 },
+      { text: "Exhale", scale: 1.0, duration: 4000 },
+      { text: "Hold", scale: 1.0, duration: 4000 },
     ],
     "equal": [
-      { text: "Inhale…", scale: 1.3, duration: 5000 },
-      { text: "Exhale…", scale: 1.0, duration: 5000 },
+      { text: "Inhale", scale: 1.3, duration: 5000 },
+      { text: "Exhale", scale: 1.0, duration: 5000 },
     ],
     "gentle": [
-      { text: "Inhale gently…", scale: 1.2, duration: 6000 },
-      { text: "Exhale gently…", scale: 1.0, duration: 6000 },
-    ]
+      { text: "Inhale gently", scale: 1.2, duration: 6000 },
+      { text: "Exhale gently", scale: 1.0, duration: 6000 },
+    ],
   };
 
   function selectMode(mode, btn) {
+    if (running) return;
     currentMode = mode;
     document.querySelectorAll(".mode-btn").forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
@@ -217,10 +228,20 @@
   function startBreathing() {
     if (running) return;
     running = true;
+
     document.getElementById("postPrompt").classList.add("hidden");
+
+    const startBtn = document.getElementById("startBtn");
+    const stopBtn = document.getElementById("stopBtn");
+
+    startBtn.disabled = true;
+    startBtn.classList.add("opacity-50", "cursor-not-allowed");
+    stopBtn.disabled = false;
+    stopBtn.classList.remove("opacity-50", "cursor-not-allowed");
 
     const circle = document.getElementById("breathingCircle");
     const text = document.getElementById("breathText");
+
     let steps = modes[currentMode];
     let index = 0;
 
@@ -244,7 +265,16 @@
     clearTimeout(timeoutRef);
 
     document.getElementById("breathingCircle").style.transform = "scale(1)";
-    document.getElementById("breathText").innerText = "Take your time…";
+    document.getElementById("breathText").innerText = "Session ended";
+
+    const startBtn = document.getElementById("startBtn");
+    const stopBtn = document.getElementById("stopBtn");
+
+    startBtn.disabled = false;
+    startBtn.classList.remove("opacity-50", "cursor-not-allowed");
+    stopBtn.disabled = true;
+    stopBtn.classList.add("opacity-50", "cursor-not-allowed");
+
     document.getElementById("postPrompt").classList.remove("hidden");
   }
 </script>

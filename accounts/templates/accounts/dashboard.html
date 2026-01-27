@@ -178,6 +178,8 @@
 
 </div>
 
+
+<!-- JS -->
 <script>
 function setMood(mood) {
   const moodMap = {
@@ -199,7 +201,9 @@ function setMood(mood) {
     },
     body: JSON.stringify({ mood }),
   }).then(() => {
-    window.location.reload();
+    setTimeout(() => {
+      window.location.href = "";
+    }, 400);
   });
 }
 </script>

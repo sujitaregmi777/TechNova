@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.utils import timezone
 from datetime import timedelta
@@ -22,3 +23,4 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return f"{self.user.username} | guest={self.is_guest}"
+

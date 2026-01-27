@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Shared Reflections · MoodMate{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto space-y-8">
+
+  <h1 class="text-3xl font-bold">Shared Reflections</h1>
+  <p class="text-sm text-[var(--muted)]">
+    A safe, anonymous space to share and support.
+  </p>
+
+  <div class="grid md:grid-cols-3 gap-6">
+    {% for r in reflections %}
+    <div class="p-6 rounded-2xl bg-[var(--surface)] border border-[var(--border)]">
+      <span class="text-xs text-[var(--primary)] uppercase">{{ r.mood }}</span>
+      <p class="mt-3 text-sm">{{ r.text }}</p>
+      <div class="flex justify-between items-center mt-4 text-xs text-[var(--muted)]">
+        <span>{{ r.time }}</span>
+        <span>💜 {{ r.relate }} relate</span>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+</div>
+{% endblock %}

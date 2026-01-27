@@ -239,5 +239,59 @@ def set_mood(request):
 def breathing(request):
     return render(request, "accounts/breathing.html")
 
+def explore(request):
+    articles = [
+        {
+            "title": "Mastering the Art of Digital Detox",
+            "excerpt": "How to reconnect with yourself in an always-on world.",
+            "read_time": "12 min read",
+            "tag": "EDITOR'S PICK",
+        },
+        {
+            "title": "Finding Joy in Small Habits",
+            "excerpt": "Why tiny routines matter more than big goals.",
+            "read_time": "5 min read",
+            "tag": "WELL-BEING",
+        },
+    ]
+
+    podcasts = [
+        {
+            "title": "Morning Gratitude Flow",
+            "duration": "15 min",
+            "author": "Dr. Sarah Chen",
+            "link": "https://www.youtube.com/watch?v=inpok4MKVLM",
+        },
+        {
+            "title": "Deep Sleep Whispers",
+            "duration": "45 min",
+            "author": "Marcus Thorne",
+            "link": "https://www.youtube.com/watch?v=ZToicYcHIOU",
+        },
+    ]
+
+    return render(request, "accounts/blog/explore.html", {
+        "articles": articles,
+        "podcasts": podcasts,
+    })
 
 
+def reflections(request):
+    reflections = [
+        {
+            "mood": "Peaceful",
+            "text": "Today I found peace in the sound of rain.",
+            "time": "2 hours ago",
+            "relate": 128,
+        },
+        {
+            "mood": "Anxious",
+            "text": "Everything feels too fast right now.",
+            "time": "1 day ago",
+            "relate": 341,
+        },
+    ]
+
+    return render(request, "accounts/blog/reflections.html", {
+        "reflections": reflections
+    })
