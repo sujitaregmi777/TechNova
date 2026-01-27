@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "allauth.socialaccount.providers.google",
 ]
 
+
 MIDDLEWARE = [
     "allauth.account.middleware.AccountMiddleware",
     'django.middleware.security.SecurityMiddleware',

@@ -201,6 +201,7 @@ def index(request):
         "reviews": reviews
     })
     #         messages.error(
+    # messages.error(
     #             request,
     #             "Your account is not verified. Please verify your email."
     #         )
