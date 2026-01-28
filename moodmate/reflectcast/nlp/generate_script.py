@@ -1,4 +1,5 @@
 import datetime
+from moodmate.reflectcast.nlp.moderation import check_content
 from moodmate.reflectcast.nlp.ollama_client import ollama_generate
 from moodmate.reflectcast.nlp.vector_store import add_reflection, get_similar_reflections
 
@@ -15,20 +16,35 @@ def clean_text(text):
 
 def build_prompt(reflection: str, emotion: str, memory_context: str) -> str:
     return (
-        f"You are a mate that reflect and provide insights to ground you.\n\n"
-        f"The user shared this reflection today about feeling {emotion}:\n"
+        "You are Moodmate — a calm reflective companion that helps users slow down and observe their thoughts. "
+        "You do NOT provide therapy, medical advice, or emotional validation. "
+        "You offer gentle reflection and grounding only.\n\n"
+
+        f"Today's journal reflection (emotion detected: {emotion}):\n"
         f"\"\"\"\n{reflection}\n\"\"\"\n\n"
-        f"Here are some past reflections to personalize the response:\n{memory_context}\n\n"
-        "Write a poetic, emotionally comforting bedtime podcast script (~60 words). "
-        "The tone should be gentle, calming, and empathetic. "
-        "Begin with a warm, gentle greeting to invite the listener in. "
-        "End with a peaceful, soothing closing line that makes the listener feel safe and cared for. "
-        "Return only the script text. No labels or formatting."
+
+        f"Past reflections for personalization:\n{memory_context}\n\n"
+
+        "Write a short bedtime-style audio script (~60 words). "
+        "Tone: gentle, calming, empathetic, grounded. "
+        "Begin with a warm welcoming greeting. "
+        "Offer one soft reflective insight or observation. "
+        "Avoid giving advice or solutions. "
+        "End with a peaceful closing line that makes the listener feel safe and settled. "
+        "Return only the script text. No titles, no labels, no formatting."
     )
 
 
 def create_script(reflection: str, emotion: str, user_id: str) -> str:
     try:
+        moderation_result = check_content(reflection)
+        if moderation_result == "hard":
+            return (
+                "I’m really glad you shared this. "
+                "It sounds like you’re facing something very heavy right now. "
+                "Moodmate can’t handle crisis situations, but you deserve real human support. "
+                "If you're in immediate danger, please contact local emergency services or a trusted person nearby."
+            )
         # Store reflection in vector memory
         add_reflection(
             user_id=user_id,
@@ -57,6 +73,12 @@ def create_script(reflection: str, emotion: str, user_id: str) -> str:
 
         # Build prompt
         prompt = build_prompt(reflection, emotion, memory_context)
+
+        if moderation_result == "soft":
+            prompt = (
+                "The user used strong or harsh language. "
+                "Respond with extra softness and grounding tone.\n\n"
+            ) + prompt
 
         # ---- Generate using Ollama ----
         print(" Generating script....")

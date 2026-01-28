@@ -43,39 +43,7 @@ def generate_tts_with_coqui(text, output_path=None):
     print("\n[Edge TTS] Starting audio generation...")
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
-
-    # Split text into sentence chunks
-    sentences = [s.strip() for s in text.split('.') if s.strip()]
-    print(f"[Edge TTS] Total text chunks: {len(sentences)}")
-
-    final_audio = AudioSegment.empty()
-
-    # Generate per sentence (keeps your original structure)
-    for idx, sentence in enumerate(sentences):
-        temp_path = output_path.with_name(f"{output_path.stem}_{idx}.mp3")
-
-        print(f"[Edge TTS] Synthesizing chunk {idx+1}/{len(sentences)}")
-
-        try:
-            # Run Edge TTS
-            asyncio.run(_edge_generate(sentence, str(temp_path)))
-
-            # Load audio safely
-            chunk_audio = AudioSegment.from_file(str(temp_path), format="mp3")
-            final_audio += chunk_audio
-
-            time.sleep(0.05)
-
-            if temp_path.exists():
-                temp_path.unlink()
-
-        except Exception as e:
-            print(f"[Edge TTS] Error on chunk {idx}: {e}")
-
-    # Export combined audio as WAV (same as your old Coqui output)
-    print(f"[Edge TTS] Exporting final audio to: {output_path}")
-    final_audio.export(str(output_path), format="wav")
-
+    asyncio.run(_edge_generate(text, str(output_path)))
     print("[Edge TTS] Audio generation complete!\n")
 
     return str(output_path)
