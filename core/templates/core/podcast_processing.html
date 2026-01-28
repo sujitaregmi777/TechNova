@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Generating Insights · MoodMate{% endblock %}
+
+{% block content %}
+<div class="max-w-xl mx-auto text-center mt-20">
+
+  <!-- Title -->
+  <h1 class="text-3xl font-bold mb-4">
+    We’re preparing your insights ✨
+  </h1>
+
+  <!-- Subtitle -->
+  <p class="text-[var(--muted)] mb-8">
+    Your reflection is being transformed into meaningful insights.  
+    This may take a moment — you can return to dashboard and check later.
+  </p>
+
+  <!-- Processing Indicator -->
+  <div class="flex justify-center mb-8">
+    <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-[var(--primary)]"></div>
+  </div>
+
+  <p class="text-sm text-[var(--muted)] mb-10">
+    Status: {{ podcast.status|title }}
+  </p>
+
+  <!-- Remind Later Button -->
+  <a href="{% url 'dashboard' %}"
+     class="inline-block px-6 py-3 rounded-xl 
+            bg-[var(--primary)] text-white font-medium
+            hover:scale-[1.03] active:scale-[0.97] transition-all">
+    Remind me later
+  </a>
+
+</div>
+
+<!-- Auto refresh every 5 seconds to check if ready -->
+<script>
+  setTimeout(function() {
+    window.location.reload();
+  }, 5000);
+</script>
+
+{% endblock %}

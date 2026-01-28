@@ -1,26 +1,68 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from threading import Thread
 
-from core.models import Journal
-from core.forms import JournalForm   # you should already have this
+from core.models import Journal, Podcast
+from core.forms import JournalForm
 
+from moodmate.reflectcast.audio.generate_audio import text_to_podcast
+from moodmate.reflectcast.audio.mix_audio import mix_voice_with_ambient
 from moodmate.reflectcast.input.handlers import process_input
 from moodmate.reflectcast.nlp.generate_script import create_script
+from moodmate.reflectcast.nlp.generate_title import generate_podcast_title
 
 
-# ----------------------------
-# ReflectCast Journal Input
-# ----------------------------
+# ---------------------------------------------------
+# Background worker for podcast generation
+# ---------------------------------------------------
+
+def generate_podcast_assets(podcast_id, journal_content, journal_mood, user_id):
+    print(f"[Podcast Worker Started (ID: {podcast_id})]")
+    podcast = Podcast.objects.get(id=podcast_id)
+
+    print(f'Generating Title...')
+    # Generate title
+    title = generate_podcast_title(
+        reflection=journal_content,
+        emotion=journal_mood
+    )
+    print(" Generating script ....")
+    # Generate script
+    script = create_script(
+        reflection=journal_content,
+        emotion=journal_mood,
+        user_id=user_id
+    )
+    # Audio
+    audio_path = text_to_podcast(script, journal_mood)
+    
+    #Mixing ambient sound
+    final_audio_path = mix_voice_with_ambient(
+            voice_path=audio_path,
+            mood=journal_mood,
+            podcast_id=podcast_id
+        )
+
+    # Save generated content
+    podcast.title = title
+    podcast.script = script
+    podcast.audio_file = final_audio_path
+    podcast.status = "ready"
+    podcast.save()
+
+
+# ---------------------------------------------------
+# Journal Input (optional text preprocessing)
+# ---------------------------------------------------
+
 @login_required
 def enter_journal(request):
     if request.method == "POST":
         user_text = request.POST.get("reflection")
         user_selected_emotion = request.POST.get("emotion")
 
-        # Save reflection text file
         reflection_text, filepath = process_input(user_text, "reflection")
 
-        # Generate podcast script
         script = create_script(
             reflection=reflection_text,
             emotion=user_selected_emotion,
@@ -35,9 +77,10 @@ def enter_journal(request):
     return render(request, "core/journal_input.html")
 
 
-# ----------------------------
-# Journal CRUD Views
-# ----------------------------
+# ---------------------------------------------------
+# Journal CRUD
+# ---------------------------------------------------
+
 @login_required
 def journal_list(request):
     journals = Journal.objects.filter(owner=request.user).order_by("-created_at")
@@ -45,14 +88,51 @@ def journal_list(request):
 
 
 @login_required
+@login_required
 def journal_create(request):
     if request.method == "POST":
         form = JournalForm(request.POST)
+        action = request.POST.get("action")
+
         if form.is_valid():
             journal = form.save(commit=False)
             journal.owner = request.user
+
+            if not journal.title.strip():
+                # Generate AI title (Gemini or fallback)
+                journal.title = generate_podcast_title(
+                 reflection=journal.content,
+                 emotion=journal.mood
+             )
+
             journal.save()
-            return redirect("journal_list")
+
+            # ---- Case 1: Save only ----
+            if action == "save":
+                return redirect("journal_list")
+
+            # ---- Case 2: Go to AI chat ----
+            if action == "chat":
+                request.session["chat_journal_id"] = journal.id
+                return redirect("ai_chat")   # we’ll wire this next
+
+            # ---- Case 3: Generate podcast ----
+            if action == "podcast":
+                podcast = Podcast.objects.create(
+                    owner=request.user,
+                    journal=journal,
+                    title="Generating...",
+                    script="",
+                    status="processing"
+                )
+
+                Thread(
+                    target=generate_podcast_assets,
+                    args=(podcast.id, journal.content, journal.mood, str(request.user.id))
+                ).start()
+
+                return redirect("podcast_processing", podcast.id)
+
     else:
         form = JournalForm()
 
@@ -83,3 +163,29 @@ def journal_delete(request, pk):
         return redirect("journal_list")
 
     return render(request, "core/delete.html", {"journal": journal})
+
+
+# ---------------------------------------------------
+# Podcast Views
+# ---------------------------------------------------
+
+@login_required
+def podcast_processing(request, pk):
+    podcast = get_object_or_404(Podcast, pk=pk, owner=request.user)
+
+    if podcast.status == "ready":
+        return redirect("listen_podcast", podcast.id)
+
+    return render(request, "core/podcast_processing.html", {"podcast": podcast})
+
+
+@login_required
+def podcast_list(request):
+    podcasts = Podcast.objects.filter(owner=request.user).order_by("-created_at")
+    return render(request, "core/podcast_list.html", {"podcasts": podcasts})
+
+
+@login_required
+def listen_podcast(request, pk):
+    podcast = get_object_or_404(Podcast, pk=pk, owner=request.user)
+    return render(request, "core/listen.html", {"podcast": podcast})

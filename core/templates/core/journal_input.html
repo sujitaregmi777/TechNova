@@ -19,31 +19,43 @@
     </p>
   </section>
 
-  <!-- Card -->
+  <!-- Reflection Card -->
   <section
     class="rounded-3xl p-6 sm:p-8
            bg-[var(--surface)]
            border border-[var(--border)]
            shadow-sm
-           flex flex-col gap-8">
+           flex flex-col gap-8
+           transition-all duration-300
+           hover:shadow-md">
 
     <form method="post" class="flex flex-col gap-7">
       {% csrf_token %}
 
-      <!-- Title -->
-      <div class="flex flex-col gap-1">
-        <label class="text-sm font-medium text-[var(--muted)]">
-          Title <span class="opacity-60">(optional)</span>
-        </label>
-        {{ form.title }}
-      </div>
-
-      <!-- Mood -->
-      <div class="flex flex-col gap-1">
+      <!-- Mood Selector -->
+      <div class="flex flex-col gap-3">
         <label class="text-sm font-medium text-[var(--muted)]">
           How are you feeling right now?
         </label>
-        {{ form.mood }}
+
+        <div class="flex flex-wrap gap-3" id="moodSelect">
+          {% for value,label in form.mood.field.choices %}
+            <button type="button"
+              data-value="{{ value }}"
+              class="mood-pill px-4 py-2 rounded-full
+                     border border-[var(--border)]
+                     text-sm
+                     hover:border-[var(--primary)]
+                     hover:scale-105
+                     active:scale-95
+                     transition-all duration-200">
+              {{ label }}
+            </button>
+          {% endfor %}
+        </div>
+
+        <!-- Hidden real input -->
+        {{ form.mood.as_hidden }}
       </div>
 
       <!-- Content -->
@@ -58,50 +70,57 @@
       </div>
 
       <!-- Actions -->
-      <div class="flex flex-wrap items-center gap-3 pt-5 border-t border-[var(--border)]">
+<div class="flex flex-wrap items-center gap-3 pt-5 border-t border-[var(--border)]">
 
-        <!-- Primary -->
-        <button type="submit"
-          class="px-6 py-3 rounded-xl
-                 bg-[var(--primary)] text-white
-                 font-medium">
-          Save reflection
-        </button>
+  <!-- Save reflection only -->
+  <button type="submit" name="action" value="save"
+    class="px-6 py-3 rounded-xl
+           bg-[var(--primary)] text-white
+           font-medium
+           hover:scale-[1.02]
+           active:scale-[0.98]
+           transition-all">
+    Save reflection
+  </button>
 
-        <!-- Secondary tools -->
-        <div class="flex gap-3">
+  <!-- Explore insights (Generate podcast) -->
+  <button type="submit" name="action" value="podcast"
+    class="group flex items-center gap-2 px-5 py-3 rounded-xl
+           border border-[var(--border)]
+           hover:border-[var(--primary)]
+           hover:bg-[var(--surface-alt)]
+           transition">
 
-          <button type="button"
-            class="group flex items-center gap-2 px-5 py-3 rounded-xl
-                   border border-[var(--border)]
-                   hover:border-[var(--primary)] transition">
+      <span class="material-symbols-outlined text-[var(--muted)]
+                   group-hover:text-[var(--primary)] transition">
+        psychology
+      </span>
 
-            <span class="material-symbols-outlined text-[var(--muted)]
-                         group-hover:text-[var(--primary)] transition">
-              psychology
-            </span>
+      <span class="text-sm">
+        Explore insights
+      </span>
+  </button>
 
-            <span class="text-sm">
-              Explore insights
-            </span>
-          </button>
+  <!-- Go to AI chat -->
+  <button type="submit" name="action" value="chat"
+    class="group flex items-center gap-2 px-5 py-3 rounded-xl
+           border border-[var(--border)]
+           hover:border-[var(--primary)]
+           hover:bg-[var(--surface-alt)]
+           transition">
 
-          <button type="button"
-            class="group flex items-center gap-2 px-5 py-3 rounded-xl
-                   border border-[var(--border)]
-                   hover:border-[var(--primary)] transition">
+      <span class="material-symbols-outlined text-[var(--muted)]
+                   group-hover:text-[var(--primary)] transition">
+        headphones
+      </span>
 
-            <span class="material-symbols-outlined text-[var(--muted)]
-                         group-hover:text-[var(--primary)] transition">
-              headphones
-            </span>
+      <span class="text-sm">
+        Chat with AI
+      </span>
+  </button>
 
-            <span class="text-sm">
-              Listen instead
-            </span>
-          </button>
+</div>
 
-        </div>
 
       </div>
     </form>
@@ -114,4 +133,21 @@
   </section>
 
 </div>
+
+<!-- Mood Pill Script -->
+<script>
+  const pills = document.querySelectorAll(".mood-pill");
+  const moodInput = document.querySelector("input[name='mood']");
+
+  pills.forEach(pill => {
+    pill.addEventListener("click", () => {
+      pills.forEach(p => {
+        p.classList.remove("bg-[var(--primary)]","text-white");
+      });
+      pill.classList.add("bg-[var(--primary)]","text-white");
+      moodInput.value = pill.dataset.value;
+    });
+  });
+</script>
+
 {% endblock %}

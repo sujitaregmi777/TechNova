@@ -5,6 +5,8 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.conf import settings
 from django.core.mail import send_mail
+
+from core.models import Journal, Podcast
 from .models import EmailOTP
 import random
 import uuid
@@ -168,7 +170,16 @@ def login_view(request):
     return render(request, "accounts/login.html")
 
 @login_required
+@login_required
 def dashboard(request):
+    latest_reflection = Journal.objects.filter(owner=request.user).order_by("-created_at").first()
+    processing_podcast = Podcast.objects.filter(owner=request.user, status="processing").order_by("-created_at").first()
+    latest_ready = Podcast.objects.filter(owner=request.user, status="ready").order_by("-created_at").first()
+    latest_podcast = processing_podcast or latest_ready
+    return render(request, "accounts/dashboard.html", {
+        "latest_reflection": latest_reflection,
+        "latest_podcast": latest_podcast,
+        "processing": bool(processing_podcast)
     streak = None
     if request.user.is_authenticated:
         streak = getattr(request.user, "userstreak", None)
