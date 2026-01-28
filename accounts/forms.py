@@ -29,13 +29,14 @@ class ReflectionForm(forms.ModelForm):
         model = Reflection
         fields = ["title", "text", "image", "is_anonymous"]    
         widgets = {
-            "title ": forms.TextInput(attrs={
+            "title": forms.TextInput(attrs={
                 "placeholder": "Share what’s on your mind…"
             }),
             "text": forms.Textarea(attrs={
                 "rows": 8,
                 "placeholder": "Write freely…"
             }),
+            "image": forms.FileInput()
         }
 
 

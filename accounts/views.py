@@ -220,14 +220,6 @@ def index(request):
 
     # return render(request, "accounts/login.html")
 
-def verify_otp(request):
-    user_id = request.session.get("otp_user_id")
-
-    if not user_id:
-        return redirect("login")
-
-    user = get_object_or_404(User, id=user_id)
-
 
 
 @csrf_exempt

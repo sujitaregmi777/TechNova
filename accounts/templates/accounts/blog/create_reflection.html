@@ -1,39 +1,119 @@
 {% extends "base.html" %}
-{% block title %}Share Reflection · MoodMate{% endblock %}
+{% block title %}
+  {% if object %}Edit Reflection · MoodMate{% else %}New Reflection · MoodMate{% endif %}
+{% endblock %}
 
 {% block content %}
-<div class="max-w-2xl mx-auto space-y-10 py-10">
+<div class="max-w-2xl mx-auto px-4 py-14">
 
-  <header class="text-center space-y-2">
-    <h1 class="text-3xl font-bold">Write freely</h1>
-    <p class="text-[var(--muted)]">
-      No names. No pressure. Just honesty.
+  <!-- Header -->
+  <header class="mb-10 text-center">
+    <h1 class="text-3xl font-semibold tracking-tight">
+      {% if object %}Edit your reflection{% else %}Write freely{% endif %}
+    </h1>
+    <p class="mt-2 text-sm text-[var(--muted)]">
+      This is your private space. You won’t lose what you write.
     </p>
   </header>
 
-  <form method="post" class="space-y-6">
+  <!-- Form -->
+  <form method="post" class="space-y-10">
     {% csrf_token %}
 
-    <div class="space-y-2">
-      <label class="text-sm font-medium">Mood</label>
-      {{ form.mood }}
-    </div>
+    <!-- Title (Mood replacement) -->
+    <div class="space-y-3">
+  <label class="text-sm font-medium">
+    Title <span class="text-[var(--muted)]">(optional)</span>
+  </label>
+  <input
+    type="text"
+    name="title"
+    value="{{ form.title.value|default_if_none:'' }}"
+    placeholder="e.g. Feeling heavy today"
+    class="w-full
+           rounded-2xl
+           bg-[var(--surface-alt)]
+           border border-[var(--border)]
+           px-5 py-3
+           text-base text-[var(--text)]
+           placeholder-[var(--muted)]
+           focus:outline-none
+           focus:border-[var(--primary)]
+           focus:ring-2 focus:ring-[var(--primary)/20]
+           transition"
+  />
+</div>
 
-    <div class="space-y-2">
-      <label class="text-sm font-medium">Your reflection</label>
-      {{ form.text }}
-    </div>
+<!-- Reflection -->
+<div class="space-y-3">
+  <label class="text-sm font-medium">
+    Your reflection
+  </label>
+  <textarea
+    name="text"
+    rows="8"
+    id="reflection-text"
+    placeholder="Write whatever is coming to you right now…"
+    class="w-full min-h-[15rem]
+           rounded-2xl
+           bg-[var(--surface-alt)]
+           border border-[var(--border)]
+           px-5 py-4
+           text-base text-[var(--text)]
+           placeholder-[var(--muted)]
+           leading-relaxed
+           resize-none
+           focus:outline-none
+           focus:border-[var(--primary)]
+           focus:ring-2 focus:ring-[var(--primary)/20]
+           transition"
+  >{{ form.text.value|default_if_none:'' }}</textarea>
+  <p class="text-xs text-[var(--muted)]">
+    No grammar rules. No filters.
+  </p>
+</div>
 
-    <label class="flex items-center gap-2 text-sm text-[var(--muted)]">
-      {{ form.is_anonymous }} Post anonymously
+
+    <!-- Anonymous -->
+    <label class="flex items-center gap-3 text-sm">
+      {{ form.is_anonymous }}
+      <span class="text-[var(--muted)]">
+        Post anonymously
+      </span>
     </label>
 
-    <button
-      class="w-full py-3 rounded-2xl bg-[var(--primary)]
-             text-white font-semibold">
-      Share Reflection
-    </button>
-  </form>
+    <!-- Actions -->
+    <div class="pt-6 flex items-center gap-4">
+      <button
+        type="submit"
+        class="flex-1 py-3 rounded-2xl
+               bg-[var(--primary)] text-white
+               font-semibold hover:opacity-90 transition">
+        {% if object %}Save changes{% else %}Save reflection{% endif %}
+      </button>
 
+      <a href="{% url 'reflections_list' %}"
+         class="text-sm text-[var(--muted)] hover:underline">
+        Cancel
+      </a>
+    </div>
+
+  </form>
 </div>
+
+<!-- Autosave (IMPORTANT) -->
+<script>
+  const textarea = document.getElementById("reflection-text");
+  const STORAGE_KEY = "moodmate_draft";
+
+  // Load draft
+  if (!textarea.value && localStorage.getItem(STORAGE_KEY)) {
+    textarea.value = localStorage.getItem(STORAGE_KEY);
+  }
+
+  // Save draft
+  textarea.addEventListener("input", () => {
+    localStorage.setItem(STORAGE_KEY, textarea.value);
+  });
+</script>
 {% endblock %}
