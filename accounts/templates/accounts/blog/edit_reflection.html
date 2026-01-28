@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Edit Reflection · MoodMate{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto space-y-10 py-12">
+
+  <!-- HEADER -->
+  <header class="space-y-2 text-center">
+    <h1 class="text-3xl font-bold">Edit your reflection</h1>
+    <p class="text-[var(--muted)]">
+      Make changes gently. Take your time.
+    </p>
+  </header>
+
+  <!-- FORM -->
+  <form method="post" enctype="multipart/form-data" class="space-y-8">
+    {% csrf_token %}
+
+    <!-- TITLE -->
+    <div class="space-y-2">
+      <label class="text-sm font-medium">Title</label>
+      {{ form.title }}
+    </div>
+
+    <!-- CONTENT -->
+    <div class="space-y-2">
+      <label class="text-sm font-medium">Your reflection</label>
+      {{ form.text }}
+    </div>
+
+    <!-- IMAGE -->
+    <div class="space-y-2">
+      <label class="text-sm font-medium">
+        Image <span class="text-[var(--muted)]">(optional)</span>
+      </label>
+
+      {% if reflection.image %}
+      <div class="flex items-center gap-4">
+        <img src="{{ reflection.image.url }}"
+             alt="Current image"
+             class="w-24 h-24 object-cover rounded-xl border border-[var(--border)]">
+
+        <p class="text-sm text-[var(--muted)]">
+          Current image
+        </p>
+      </div>
+      {% endif %}
+
+      {{ form.image }}
+    </div>
+
+    <!-- ANONYMOUS -->
+    <label class="flex items-center gap-2 text-sm text-[var(--muted)]">
+      {{ form.is_anonymous }}
+      Post anonymously
+    </label>
+
+    <!-- ACTIONS -->
+    <div class="flex items-center justify-between pt-6">
+
+      <a href="{% url 'reflection_detail' reflection.id %}"
+         class="text-sm text-[var(--muted)] hover:underline">
+        ← Cancel
+      </a>
+
+      <button
+        class="px-6 py-3 rounded-2xl
+               bg-[var(--primary)] text-white
+               font-semibold">
+        Save changes
+      </button>
+
+    </div>
+
+  </form>
+
+</div>
+{% endblock %}

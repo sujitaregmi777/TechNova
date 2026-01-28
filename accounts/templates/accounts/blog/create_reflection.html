@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Share Reflection · MoodMate{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto space-y-10 py-10">
+
+  <header class="text-center space-y-2">
+    <h1 class="text-3xl font-bold">Write freely</h1>
+    <p class="text-[var(--muted)]">
+      No names. No pressure. Just honesty.
+    </p>
+  </header>
+
+  <form method="post" class="space-y-6">
+    {% csrf_token %}
+
+    <div class="space-y-2">
+      <label class="text-sm font-medium">Mood</label>
+      {{ form.mood }}
+    </div>
+
+    <div class="space-y-2">
+      <label class="text-sm font-medium">Your reflection</label>
+      {{ form.text }}
+    </div>
+
+    <label class="flex items-center gap-2 text-sm text-[var(--muted)]">
+      {{ form.is_anonymous }} Post anonymously
+    </label>
+
+    <button
+      class="w-full py-3 rounded-2xl bg-[var(--primary)]
+             text-white font-semibold">
+      Share Reflection
+    </button>
+  </form>
+
+</div>
+{% endblock %}

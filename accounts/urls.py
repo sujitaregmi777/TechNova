@@ -44,8 +44,17 @@ urlpatterns = [
     ),
     path("set-mood/", views.set_mood, name="set_mood"),
     path("breathing/", views.breathing, name="breathing"),
+    path("reflections/", views.reflections_list, name="reflections_list"),
+    path("reflections/new/", views.create_reflection, name="create_reflection"),
+    path("reflections/<int:pk>/", views.reflection_detail, name="reflection_detail"),
+    path("reflections/<int:pk>/edit/", views.edit_reflection, name="edit_reflection"),
+    path("reflections/<int:pk>/comment/", views.add_comment, name="add_comment"),
     path("explore/", views.explore, name="explore"),
-    path("reflections/", views.reflections, name="reflections"),
+    path("read/<int:pk>/", views.article_detail, name="article_detail"),
+    path("blogs/", views.blogs, name="blogs"),
+
+
+
 ]
 
 

@@ -1,42 +1,59 @@
 {% extends "base.html" %}
-{% block title %}Explore · MoodMate{% endblock %}
+{% block title %}Gentle Reads · MoodMate{% endblock %}
 
 {% block content %}
-<div class="max-w-6xl mx-auto space-y-10">
 
-  <h1 class="text-3xl font-bold">Explore</h1>
+<section class="space-y-10">
 
-  <!-- ARTICLES -->
-  <section>
-    <h2 class="text-xl font-semibold mb-4">Featured Articles</h2>
-    <div class="grid sm:grid-cols-2 gap-6">
-      {% for a in articles %}
-      <div class="p-6 rounded-2xl bg-[var(--surface)] border border-[var(--border)]">
-        <span class="text-xs text-[var(--primary)]">{{ a.tag }}</span>
-        <h3 class="mt-2 font-semibold">{{ a.title }}</h3>
-        <p class="text-sm text-[var(--muted)] mt-1">{{ a.excerpt }}</p>
-        <p class="text-xs mt-3 text-[var(--muted)]">{{ a.read_time }}</p>
+  <!-- Heading -->
+  <div class="space-y-2">
+    <h2 class="text-3xl font-bold">Gentle Reads</h2>
+    <p class="text-[var(--muted)] max-w-xl">
+      Curated reflections and articles designed to be read slowly.
+    </p>
+  </div>
+
+  <!-- Cards -->
+  <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for a in articles %}
+    <a href="{% url 'article_detail' a.id %}"
+       class="group rounded-3xl overflow-hidden
+              bg-[var(--surface)] border border-[var(--border)]
+              hover:border-[var(--primary)]
+              transition">
+
+      {% if a.image %}
+      <div class="aspect-[4/3] overflow-hidden">
+        <img
+          src="{{ a.image.url }}"
+          alt="{{ a.title }}"
+          class="w-full h-full object-cover
+                 transition group-hover:scale-[1.03]"
+        />
       </div>
-      {% endfor %}
-    </div>
-  </section>
+      {% endif %}
 
-  <!-- PODCASTS -->
-  <section>
-    <h2 class="text-xl font-semibold mb-4">Daily Podcasts</h2>
-    <div class="space-y-4">
-      {% for p in podcasts %}
-      <a href="{{ p.link }}" target="_blank"
-         class="block p-5 rounded-2xl bg-[var(--surface)] border border-[var(--border)]
-                hover:border-[var(--primary)] transition">
-        <h4 class="font-medium">{{ p.title }}</h4>
-        <p class="text-sm text-[var(--muted)]">
-          {{ p.author }} · {{ p.duration }}
+      <div class="p-5">
+        <h3 class="text-lg font-semibold leading-snug">
+          {{ a.title }}
+        </h3>
+
+        <p class="mt-1 text-xs text-[var(--muted)]">
+          Curated · {{ a.created_at|date:"M d, Y" }}
         </p>
-      </a>
-      {% endfor %}
-    </div>
-  </section>
-
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+<div class="pt-10">
+  <a href="{% url 'reflections_list' %}"
+     class="inline-flex items-center gap-2
+            text-sm font-medium text-[var(--primary)]
+            hover:underline">
+    See what others are sharing →
+  </a>
 </div>
+
+</section>
+
 {% endblock %}

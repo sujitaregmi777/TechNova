@@ -15,6 +15,8 @@ venv/
 db.sqlite3
 
 # Django migrations (optional to ignore)
+# Media files
+media/
 */migrations/*.pyc
 */migrations/__pycache__/
 */migrations/*.py

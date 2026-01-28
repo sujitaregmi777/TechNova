@@ -23,4 +23,64 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return f"{self.user.username} | guest={self.is_guest}"
+    
+
+class Article(models.Model):
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    title = models.CharField(max_length=200)
+    content = models.TextField()
+
+    image = models.ImageField(
+        upload_to="articles/",
+        blank=True,
+        null=True
+    )
+
+    source = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="Optional (e.g. WHO, Mind.org, Adapted)"
+    )
+
+    is_curated = models.BooleanField(
+        default=True,
+        help_text="Curated wellbeing content"
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.title
+
+
+
+class Reflection(models.Model):
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    is_anonymous = models.BooleanField(default=False)
+
+    title = models.CharField(max_length=200)
+    text = models.TextField()
+
+    image = models.ImageField(
+        upload_to="reflections/",
+        blank=True,
+        null=True
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def display_name(self):
+        return "Anonymous" if self.is_anonymous else self.author.username
+
+
+
+class Comment(models.Model):
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    reflection = models.ForeignKey(
+        Reflection, on_delete=models.CASCADE, related_name="comments"
+    )
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
 

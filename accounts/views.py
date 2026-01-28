@@ -11,6 +11,11 @@ import random,uuid
 import json
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from .models import Reflection
+from .forms import ReflectionForm, CommentForm
+from .utils import check_content
+from .models import Article
+
 
 def generate_otp():
     return str(random.randint(100000, 999999))
@@ -239,59 +244,114 @@ def set_mood(request):
 def breathing(request):
     return render(request, "accounts/breathing.html")
 
-def explore(request):
-    articles = [
-        {
-            "title": "Mastering the Art of Digital Detox",
-            "excerpt": "How to reconnect with yourself in an always-on world.",
-            "read_time": "12 min read",
-            "tag": "EDITOR'S PICK",
-        },
-        {
-            "title": "Finding Joy in Small Habits",
-            "excerpt": "Why tiny routines matter more than big goals.",
-            "read_time": "5 min read",
-            "tag": "WELL-BEING",
-        },
-    ]
-
-    podcasts = [
-        {
-            "title": "Morning Gratitude Flow",
-            "duration": "15 min",
-            "author": "Dr. Sarah Chen",
-            "link": "https://www.youtube.com/watch?v=inpok4MKVLM",
-        },
-        {
-            "title": "Deep Sleep Whispers",
-            "duration": "45 min",
-            "author": "Marcus Thorne",
-            "link": "https://www.youtube.com/watch?v=ZToicYcHIOU",
-        },
-    ]
-
-    return render(request, "accounts/blog/explore.html", {
-        "articles": articles,
-        "podcasts": podcasts,
-    })
-
-
-def reflections(request):
-    reflections = [
-        {
-            "mood": "Peaceful",
-            "text": "Today I found peace in the sound of rain.",
-            "time": "2 hours ago",
-            "relate": 128,
-        },
-        {
-            "mood": "Anxious",
-            "text": "Everything feels too fast right now.",
-            "time": "1 day ago",
-            "relate": 341,
-        },
-    ]
-
-    return render(request, "accounts/blog/reflections.html", {
+def reflections_list(request):
+    reflections = Reflection.objects.order_by("-created_at")
+    return render(request, "accounts/blog/reflections_list.html", {
         "reflections": reflections
     })
+
+def reflection_detail(request, pk):
+    reflection = get_object_or_404(Reflection, pk=pk)
+    return render(request, "accounts/blog/reflection_detail.html", {
+        "reflection": reflection
+    })
+
+
+
+@login_required
+def create_reflection(request):
+    if request.method == "POST":
+        form = ReflectionForm(request.POST)
+        if form.is_valid():
+            check = check_content(form.cleaned_data["text"])
+
+            if check == "hard":
+                messages.error(request, "This post contains harmful language.")
+                return redirect("create_reflection")
+
+            reflection = form.save(commit=False)
+            reflection.author = request.user
+            reflection.save()
+            return redirect("reflections_list")
+    else:
+        form = ReflectionForm()
+
+    return render(request, "accounts/blog/create_reflection.html", {"form": form})
+
+@login_required
+def edit_reflection(request, pk):
+    reflection = get_object_or_404(Reflection, pk=pk)
+
+    if reflection.author != request.user:
+        return redirect("reflection_detail", pk=pk)
+
+    if request.method == "POST":
+        form = ReflectionForm(
+            request.POST,
+            request.FILES,
+            instance=reflection
+        )
+        if form.is_valid():
+            form.save()
+            return redirect("reflection_detail", pk=pk)
+    else:
+        form = ReflectionForm(instance=reflection)
+
+    return render(request, "accounts/blog/edit_reflection.html", {
+        "form": form,
+        "reflection": reflection
+    })
+
+
+
+@login_required
+def add_comment(request, pk):
+    reflection = get_object_or_404(Reflection, pk=pk)
+
+    if request.method == "POST":
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            check = check_content(form.cleaned_data["content"])
+
+            if check == "hard":
+                messages.error(request, "This comment contains harmful language.")
+                return redirect("reflections_list")
+
+            if check == "soft":
+                messages.warning(request, "Please keep responses supportive.")
+                return redirect("reflections_list")
+
+            comment = form.save(commit=False)
+            comment.author = request.user
+            comment.reflection = reflection
+            comment.save()
+
+    return redirect("reflections_list")
+
+def explore(request):
+    articles = Article.objects.order_by("-created_at")
+    return render(
+        request,
+        "accounts/blog/explore.html",
+        {"articles": articles}
+    )
+
+def article_detail(request, pk):
+    article = get_object_or_404(Article, pk=pk)
+    return render(
+        request,
+        "accounts/blog/article_detail.html",
+        {"article": article}
+    )
+def blogs(request):
+    articles = Article.objects.order_by("-created_at")[:6]
+    reflections = Reflection.objects.order_by("-created_at")[:6]
+
+    return render(
+        request,
+        "accounts/blog/blogs.html",
+        {
+            "articles": articles,
+            "reflections": reflections,
+        }
+    )
