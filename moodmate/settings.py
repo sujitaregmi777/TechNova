@@ -39,15 +39,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    "django.contrib.sites",
+    'accounts',
     'core',
-     "django.contrib.sites",
-     'accounts',
-     "allauth",
+    "allauth",
     "allauth.account",
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
-    'user_settings.apps.UserSettingsConfig',
-    
 ]
 
 
@@ -170,4 +168,5 @@ DEFAULT_FROM_EMAIL = "Moodmate <moodmate@gmail.com>"
 
 SESSION_COOKIE_AGE = 1209600  
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+
 
