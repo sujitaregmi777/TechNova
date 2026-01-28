@@ -36,7 +36,7 @@ def generate_podcast_assets(podcast_id, journal_content, journal_mood, user_id):
         user_id=user_id
     )
     # Audio
-    audio_path = text_to_podcast(script, journal_mood)
+    audio_path = text_to_podcast(script)
     
     #Mixing ambient sound
     final_audio_path = mix_voice_with_ambient(
@@ -220,3 +220,27 @@ def chat_list(request):
         "chats": chats
     })
 
+def ai_chat(request):
+    messages = ChatMessage.objects.filter(user=request.user).order_by("created_at")
+
+    if request.method == "POST":
+        user_text = request.POST["message"]
+
+        ChatMessage.objects.create(
+            user=request.user,
+            sender="user",
+            text=user_text
+        )
+
+        # --- AI response (later connect to Ollama) ---
+        ai_reply = generate_ai_reply(user_text)
+
+        ChatMessage.objects.create(
+            user=request.user,
+            sender="ai",
+            text=ai_reply
+        )
+
+        return redirect("ai_chat")
+
+    return render(request, "ai_chat.html", {"messages": messages})

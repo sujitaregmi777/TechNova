@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}AI Chat · MoodMate{% endblock %}
+{% block content %}
+
+<div class="max-w-4xl mx-auto mt-8 px-4 flex flex-col h-[80vh]">
+
+  <!-- HEADER -->
+  <div class="flex items-center justify-between mb-4">
+    <div>
+      <h1 class="text-3xl font-bold text-[var(--text)]">AI Companion</h1>
+      <p class="text-[var(--muted)]">Talk freely. I'm listening 💬</p>
+    </div>
+
+    <a href="{% url 'new_ai_chat' %}"
+       class="px-4 py-2 rounded-xl bg-[var(--primary)] text-white text-sm font-medium">
+      + New Chat
+    </a>
+  </div>
+
+  <!-- CHAT WINDOW -->
+  <div id="chatWindow"
+       class="flex-1 overflow-y-auto space-y-4 p-4 bg-[var(--surface)]
+              border border-[var(--border)] rounded-2xl">
+
+    {% for message in messages %}
+
+      {% if message.sender == "ai" %}
+      <!-- AI MESSAGE -->
+      <div class="flex items-start gap-3">
+        <div class="w-9 h-9 rounded-full bg-[var(--primary)] flex items-center justify-center text-white">
+          🤖
+        </div>
+        <div class="bg-white border border-[var(--border)] rounded-2xl px-4 py-2 max-w-[70%]">
+          <p class="text-sm">{{ message.text }}</p>
+        </div>
+      </div>
+
+      {% else %}
+      <!-- USER MESSAGE -->
+      <div class="flex justify-end">
+        <div class="bg-[var(--primary)] text-white rounded-2xl px-4 py-2 max-w-[70%]">
+          <p class="text-sm">{{ message.text }}</p>
+        </div>
+      </div>
+      {% endif %}
+
+    {% endfor %}
+
+  </div>
+
+  <!-- INPUT BAR -->
+  <form method="post" class="mt-4 flex gap-3">
+    {% csrf_token %}
+    <input name="message"
+           placeholder="Type your message..."
+           class="flex-1 px-4 py-3 rounded-xl border border-[var(--border)]
+                  bg-[var(--surface)] focus:outline-none focus:ring-2
+                  focus:ring-[var(--primary)]">
+
+    <button class="px-5 py-3 rounded-xl bg-[var(--primary)] text-white font-medium">
+      Send ➤
+    </button>
+  </form>
+
+</div>
+
+{% endblock %}
