@@ -42,6 +42,8 @@ urlpatterns = [
         ),
         name="password_reset_complete"
     ),
+    path("comments/<int:pk>/delete/",views.delete_comment,name="delete_comment"),
+
     path("set-mood/", views.set_mood, name="set_mood"),
     path("breathing/", views.breathing, name="breathing"),
     path("reflections/", views.reflections_list, name="reflections_list"),
@@ -52,6 +54,9 @@ urlpatterns = [
     path("explore/", views.explore, name="explore"),
     path("read/<int:pk>/", views.article_detail, name="article_detail"),
     path("blogs/", views.blogs, name="blogs"),
+    path("reflections/<int:pk>/delete/",views.delete_reflection,name="delete_reflection"),
+
+    
 
 
 

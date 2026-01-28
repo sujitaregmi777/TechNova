@@ -69,17 +69,31 @@
     </p>
   </section>
 
-  <!-- RECENT PRESENCE -->
-  <section class="rounded-3xl p-6 bg-[var(--surface)]
-                 border border-[var(--border)] flex flex-col gap-2">
-    <h3 class="text-base font-semibold">Your recent presence</h3>
+ <!-- RECENT PRESENCE -->
+<section class="rounded-3xl p-6 bg-[var(--surface)]
+               border border-[var(--border)] flex flex-col gap-2">
+
+  <h3 class="text-base font-semibold">Your recent presence</h3>
+
+  {% if user.is_authenticated and streak %}
+    {% if streak.current_streak > 0 %}
+      <p class="text-sm text-[var(--muted)]">
+        🔥 You’re on a <strong>{{ streak.current_streak }}-day</strong> presence streak.
+        Showing up matters.
+      </p>
+    {% else %}
+      <p class="text-sm text-[var(--muted)]">
+        Today can be your first step. Just check in once.
+      </p>
+    {% endif %}
+  {% else %}
     <p class="text-sm text-[var(--muted)]">
-      {% if user.is_authenticated %}
-        You’ve checked in a few times recently. That consistency matters.
-      {% else %}
-        You’ve returned here before. That’s enough for today.
-      {% endif %}
+      You’ve returned here before. That’s enough for today.
     </p>
+  {% endif %}
+
+</section>
+
 
     <div class="flex gap-2 mt-2">
       <span class="px-3 py-1 rounded-full text-xs

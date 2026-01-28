@@ -73,14 +73,32 @@ class Reflection(models.Model):
     def display_name(self):
         return "Anonymous" if self.is_anonymous else self.author.username
 
-
-
 class Comment(models.Model):
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
     reflection = models.ForeignKey(
-        Reflection, on_delete=models.CASCADE, related_name="comments"
+        Reflection,
+        on_delete=models.CASCADE,
+        related_name="comments"
+    )
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE
     )
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Comment by {self.author} on {self.reflection}"
+
+class UserStreak(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
+    current_streak = models.PositiveIntegerField(default=0)
+    last_checkin = models.DateField(null=True, blank=True)
+    longest_streak = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return f"{self.user} – {self.current_streak} days"
 
 

@@ -13,8 +13,9 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .models import Reflection
 from .forms import ReflectionForm, CommentForm
-from .utils import check_content
-from .models import Article
+from .utils import check_content,update_streak
+from .models import Article, Comment
+
 
 
 def generate_otp():
@@ -163,8 +164,6 @@ def login_view(request):
 
     return render(request, "accounts/login.html")
 
-
-
 def guest_login(request):
     username = f"guest_{uuid.uuid4().hex[:10]}"
 
@@ -182,7 +181,14 @@ def guest_login(request):
 
 @login_required
 def dashboard(request):
-    return render (request, "accounts/dashboard.html")
+    streak = None
+    if request.user.is_authenticated:
+        streak = getattr(request.user, "userstreak", None)
+
+    return render(request, "accounts/dashboard.html", {
+        "streak": streak
+    })
+
 
 def index(request):
     reviews = [
@@ -242,10 +248,13 @@ def reflections_list(request):
         "reflections": reflections
     })
 
+@login_required
 def reflection_detail(request, pk):
     reflection = get_object_or_404(Reflection, pk=pk)
+
     return render(request, "accounts/blog/reflection_detail.html", {
-        "reflection": reflection
+        "reflection": reflection,
+        "form": CommentForm()
     })
 
 
@@ -295,30 +304,35 @@ def edit_reflection(request, pk):
     })
 
 
-
 @login_required
 def add_comment(request, pk):
+
     reflection = get_object_or_404(Reflection, pk=pk)
 
     if request.method == "POST":
         form = CommentForm(request.POST)
         if form.is_valid():
-            check = check_content(form.cleaned_data["content"])
+            content = form.cleaned_data["content"]
+            print("🔥 COMMENT FORM SUBMITTED")
+
+            check = check_content(content)
+            print("✅ BEFORE CHECK")
+
+
 
             if check == "hard":
                 messages.error(request, "This comment contains harmful language.")
-                return redirect("reflections_list")
+                return redirect("reflection_detail", pk=pk)
 
             if check == "soft":
                 messages.warning(request, "Please keep responses supportive.")
-                return redirect("reflections_list")
 
             comment = form.save(commit=False)
             comment.author = request.user
             comment.reflection = reflection
             comment.save()
 
-    return redirect("reflections_list")
+    return redirect("reflection_detail", pk=pk)
 
 def explore(request):
     articles = Article.objects.order_by("-created_at")
@@ -347,3 +361,40 @@ def blogs(request):
             "reflections": reflections,
         }
     )
+
+@login_required
+def delete_comment(request, pk):
+    comment = get_object_or_404(Comment, pk=pk)
+
+    # permission check
+    if comment.author != request.user:
+        messages.error(request, "You cannot delete this comment.")
+        return redirect("reflection_detail", pk=comment.reflection.id)
+
+    if request.method == "POST":
+        reflection_id = comment.reflection.id
+        comment.delete()
+        messages.success(request, "Comment deleted.")
+        return redirect("reflection_detail", pk=reflection_id)
+
+
+    return redirect("reflection_detail", pk=comment.reflection.id)
+
+@login_required
+def delete_reflection(request, pk):
+    reflection = get_object_or_404(Reflection, pk=pk)
+
+    # Permission check
+    if reflection.author != request.user:
+        messages.error(request, "You cannot delete this reflection.")
+        return redirect("reflection_detail", pk=pk)
+
+    if request.method == "POST":
+        reflection.delete()
+        messages.success(request, "Reflection deleted.")
+        return redirect("reflections_list")
+
+    # Safety fallback
+    return redirect("reflection_detail", pk=pk)
+
+
