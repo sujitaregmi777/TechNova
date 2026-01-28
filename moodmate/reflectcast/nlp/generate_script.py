@@ -1,45 +1,68 @@
-import datetime
 import os
+import datetime
+import random
 from dotenv import load_dotenv
-from openai import OpenAI
 
 from moodmate.reflectcast.nlp.vector_store import add_reflection, get_similar_reflections
 
+# Try Gemini if available
+try:
+    from google import genai
+    GEMINI_AVAILABLE = True
+except:
+    GEMINI_AVAILABLE = False
+
 load_dotenv()
+GEMINI_KEY = os.getenv("GEMINI_API_KEY")
 
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-if not OPENAI_API_KEY:
-    raise Exception("OPENAI_API_KEY environment variable not set")
+if GEMINI_AVAILABLE and GEMINI_KEY:
+    client = genai.Client(api_key=GEMINI_KEY)
+else:
+    client = None
 
-client = OpenAI(api_key=OPENAI_API_KEY)
+
+OPENING_LINES = [
+    "Hello, gentle soul.",
+    "Welcome back, dear friend.",
+    "Take a slow breath with me.",
+    "Settle into this quiet moment."
+]
+
+CLOSING_LINES = [
+    "You are safe. Rest well.",
+    "I’m here whenever you need me.",
+    "Let the day drift away peacefully.",
+    "You are cared for. Good night."
+]
+
 
 def clean_text(text):
-    """Remove weird quotes and formatting artifacts."""
-    return (text.replace("’", "'")
-                .replace("‘", "'")
-                .replace("“", '"')
-                .replace("”", '"')
-                .replace("\u200b", '')
-                .strip())
+    return text.strip()
 
-def build_prompt(reflection: str, emotion: str, memory_context: str) -> str:
+
+def build_local_script(reflection, emotion, memory_context):
+    """Offline poetic generator using reflection + memory"""
+
+    opening = random.choice(OPENING_LINES)
+    closing = random.choice(CLOSING_LINES)
+
+    memory_line = ""
+    if memory_context:
+        memory_line = "I remember you’ve felt similar moments before. "
+
     return (
-        f"The user shared this reflection today about feeling {emotion}:\n"
-        f"\"\"\"\n{reflection}\n\"\"\"\n\n"
-        f"Here are some past reflections to personalize the response:\n{memory_context}\n\n"
-        "Now, write a poetic, emotionally comforting bedtime podcast script (~50 words). "
-        "The tone should be gentle, calming, and empathetic. It should help the user feel seen, supported, and at peace. "
-        "Begin with a warm, gentle greeting to invite the listener in. The tone should be comforting, kind, and emotionally supportive throughout."
-        "End with a peaceful, soothing message, either wishing them good night (if appropriate to the time) or offering a reassuring reminder like 'I'm here whenever you need me."
-        " The goal is to leave the listener feeling safe, calm, and cared for."
-        " Do not include section labels or any formatting tags."
+        f"{opening} "
+        f"Tonight you shared feeling {emotion}. "
+        f"{memory_line}"
+        f"Your words matter: '{reflection[:80]}...'. "
+        f"Let yourself soften. "
+        f"{closing}"
     )
 
-def create_script(reflection: str, emotion: str,user_id: str) -> str:
-    try:
-        date_str = datetime.datetime.now().strftime("%Y-%m-%d")
 
-        # Save user reflection to vector store
+def create_script(reflection: str, emotion: str, user_id: str) -> str:
+    try:
+        # Save to vector DB
         add_reflection(
             user_id=user_id,
             reflection_text=reflection,
@@ -49,41 +72,51 @@ def create_script(reflection: str, emotion: str,user_id: str) -> str:
             episode_script=None
         )
 
-        # Get similar past reflections for memory context
+        # Memory retrieval
         similar_docs = get_similar_reflections(reflection, user_id=user_id)
         memory_contexts = []
+
         for doc in similar_docs:
-            meta = doc.get("metadata", {})
             text = doc.get("document", "")
             if text != reflection:
-                memory_contexts.append(
-                    f"This is what the user felt on {meta.get('date', 'unknown')} because of this: \"{text[:120]}...\""
+                memory_contexts.append(text)
+
+        memory_context = "\n".join(memory_contexts)
+
+        # --- Try Gemini if available ---
+        if client:
+            try:
+                prompt = (
+                    f"The user shared this reflection about feeling {emotion}:\n"
+                    f"{reflection}\n\n"
+                    f"Past reflections:\n{memory_context}\n\n"
+                    "Write a gentle, comforting bedtime podcast script (~60 words)."
                 )
-        memory_context = "\n".join(memory_contexts) if memory_contexts else "No specific memory found, but the user has felt deeply before."
 
-        # Build prompt
-        prompt = build_prompt(reflection, emotion, memory_context)
+                response = client.models.generate_content(
+                    model="gemini-2.0-flash",
+                    contents=prompt
+                )
 
-        # Generate script using OpenAI chat completion
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[
-                {"role": "system", "content": "You are a compassionate bedtime podcast writer."},
-                {"role": "user", "content": prompt}
-            ],
-            max_tokens=450,
-            temperature=0.7,
-        )
+                script = response.text.strip()
+                if script:
+                    return clean_text(script)
 
-        return clean_text(response.choices[0].message.content.strip())
+            except Exception:
+                print("⚠️ Gemini unavailable → using offline script generator")
+
+        # --- Always safe offline fallback ---
+        return clean_text(build_local_script(reflection, emotion, memory_context))
 
     except Exception as e:
-        print(f"Error generating script: {e}")
-        return clean_text(
-            "Hello there.\n\n"
-            "Take a deep breath and settle into this moment.\n\n"
-            "Life can be overwhelming, but you’re doing your best — and that’s enough.\n\n"
-            "Let go of any tension, and allow yourself to relax.\n\n"
-            "Tonight is your time to rest, to heal, and simply be.\n\n"
-            "Remember, you are not alone. Wishing you a calm and restful night."
-        )
+        print("⚠️ Script system fallback triggered:", e)
+        return clean_text(build_local_script(reflection, emotion, ""))
+
+
+# Test
+if __name__ == "__main__":
+    print(create_script(
+        "I felt overwhelmed but proud I finished my work.",
+        "motivated",
+        "test_user"
+    ))

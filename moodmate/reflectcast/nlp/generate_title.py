@@ -1,22 +1,21 @@
-# generate_title.py
+from google import genai
 import os
-from dotenv import load_dotenv
-from openai import OpenAI
 
-load_dotenv()
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
 def generate_podcast_title(reflection: str, mood: str) -> str:
-    """Generate a short, catchy podcast title using GPT-4o-mini."""
-    prompt = f"Generate a short, creative podcast title (max 3 words) for a {mood} reflection: {reflection}"
-    resp = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[{"role": "user", "content": prompt}],
-        max_tokens=15,
-        temperature=0.7,
+    prompt = (
+        f"Generate a short, creative podcast title of 2 to 3 words "
+        f"for a {mood} reflection: {reflection}. "
+        f"Return only the title text."
     )
-    return resp.choices[0].message.content.strip()
 
-# Example
-if __name__ == "__main__":
-    print(generate_podcast_title("I felt grateful for small joys today.", "grateful"))
+    try:
+        response = client.models.generate_content(
+            model="gemini-1.5-flash-8b",
+            contents=prompt
+        )
+        return response.text.strip()
+    except Exception as e:
+        print("Gemini failed:", e)
+        return "Untitled Reflection"
