@@ -10,69 +10,28 @@
 
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
 
-<style>
-  :root {
-    /* Backgrounds */
-    --bg: #f4f3f8;
-    --surface: #ffffff;
-    --surface-alt: #f1eff7;
+  <style>
+:root {
+  --bg: #ffffff;
+  --surface: #ffffff;
+  --surface-alt: #f4fbf8;
+  --border: #e5f0ea;
+  --text: #1a1a1a;
+  --muted: #5f6368;
+  --primary: #0A9B63;
+}
 
-    /* Borders & dividers */
-    --border: #e4e1ee;
-
-    /* Text */
-    --text: #1e1a2b;
-    --text-soft: #3a3550;
-    --muted: #6e6985;
-
-    /* Brand */
-    --primary: #7b5cff;
-    --primary-soft: #ebe6ff;
-
-    /* Status */
-    --success: #2fbf71;
-    --warning: #f4b740;
-    --danger: #e25563;
-
-    /* Effects */
-    --shadow-sm: 0 2px 6px rgba(30, 26, 43, 0.06);
-    --shadow-md: 0 8px 24px rgba(30, 26, 43, 0.08);
-
-    /* Shape */
-    --radius-sm: 10px;
-    --radius-md: 16px;
-    --radius-lg: 22px;
-  }
-
-  html.dark {
-    /* Backgrounds */
-    --bg: #120e1c;
-    --surface: #1b152a;
-    --surface-alt: #241c3a;
-
-    /* Borders */
-    --border: #2f2550;
-
-    /* Text */
-    --text: #ebe7f6;
-    --text-soft: #cfc8ee;
-    --muted: #a79bd4;
-
-    /* Brand */
-    --primary: #a889ff;
-    --primary-soft: #2a2150;
-
-    /* Status */
-    --success: #42d392;
-    --warning: #f5c16c;
-    --danger: #f0727f;
-
-    /* Effects */
-    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.35);
-    --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.45);
-  }
+html.dark {
+  --bg: #0f1720;
+  --surface: #16202a;
+  --surface-alt: #1f2d3a;
+  --border: #243646;
+  --text: #ffffff;
+  --muted: #9fb3c8;
+  --primary: #2dd4a3;
+}
 </style>
-
+</head>
 
 <body class="bg-[var(--bg)] text-[var(--text)] min-h-screen flex transition-colors duration-200">
 
@@ -118,13 +77,6 @@
       <span class="material-symbols-outlined text-[var(--primary)]">air</span>
       <span class="hidden group-hover:block font-medium">Breathing</span>
     </a>
-
-    <a href="/blogs/"
-   class="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-[var(--surface-alt)]">
-  <span class="material-symbols-outlined text-[var(--primary)]">forum</span>
-  <span class="hidden group-hover:block font-medium">Community</span>
-</a>
-
 
   </nav>
 
@@ -220,9 +172,9 @@
   </header>
 
   <!-- CONTENT -->
-  <!-- <main class="flex-1 p-6 sm:p-8"> -->
+  <main class="flex-1 p-6 sm:p-8">
     {% block content %}{% endblock %}
-  <!-- </main> -->
+  </main>
 
 </div>
 

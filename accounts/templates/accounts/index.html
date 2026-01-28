@@ -1,51 +1,28 @@
+{% load static %}
 <!DOCTYPE html>
-<html lang="en" class="light">
+<html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>MoodMate | Your Daily Wellness Companion</title>
+  <meta charset="UTF-8">
+  <title>Moodmate</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
-    <!-- Material Symbols -->
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700" rel="stylesheet">
-
-    <!-- Tailwind -->
-    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
-    <script>
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        primary: "#2bbdee",
-                        lavender: "#9f7aea",
-                        "background-light": "#f6f7f8",
-                        "background-dark": "#101d22",
-                    },
-                    fontFamily: {
-                        display: ["Plus Jakarta Sans", "sans-serif"],
-                    },
-                },
-            },
-        };
-    </script>
-
-    <style>
-        body {
-            font-family: "Plus Jakarta Sans", sans-serif;
-            scroll-behavior: smooth;
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#0A9B63',
+            primarySoft: '#E6F7F0',
+            textMain: '#1a1a1a',
+            textMuted: '#5f6368'
+          }
         }
-        .gradient-mesh {
-            background:
-                radial-gradient(at 0% 0%, rgba(43,189,238,0.15) 0%, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(159,122,234,0.15) 0%, transparent 50%);
-        }
-    </style>
+      }
+    }
+  </script>
 </head>
 
-<body class="bg-background-light text-[#0d181b]">
+<body class="bg-white text-textMain">
 
 <div class="flex flex-col min-h-screen">
 
@@ -76,25 +53,32 @@
                     Login
                 </a>
             </div>
+<!-- Header -->
+<header class="w-full border-b border-neutral-200">
+  <div class="max-w-7xl mx-auto px-8">
+    <nav class="h-16 flex items-center justify-between">
 
+      <!-- Logo -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold">
+          M
         </div>
-    </header>
+        <span class="font-semibold text-lg">Moodmate</span>
+      </div>
 
-    <!-- HERO -->
-    <main id="home" class="flex-1 flex items-center justify-center p-6 text-center">
-        <div class="gradient-mesh max-w-3xl w-full rounded-2xl p-10 border border-white flex flex-col items-center gap-4">
+      <!-- Nav -->
+      <div class="flex items-center gap-6">
+        <a href="/login" class="text-sm font-medium hover:text-primary transition">Login</a>
+        <a href="/register"
+           class="px-5 py-2 rounded-full bg-primary text-white font-medium text-sm shadow-md shadow-primary/30">
+          Get started
+        </a>
+      </div>
 
-            <span class="bg-white/80 px-3 py-1 rounded-full text-xs font-bold text-primary uppercase">
-                Your Mental Sanctuary
-            </span>
+    </nav>
+  </div>
+</header>
 
-            <h1 class="text-4xl md:text-5xl font-black">
-                Check in with yourself. Every day.
-            </h1>
-
-            <p class="text-[#4c869a] max-w-xl">
-                Your safe space for mental clarity, guided breathing, and mindful reflection.
-            </p>
 
             <a href="{% url 'login' %}"
                class="mt-4 bg-primary text-white px-8 py-4 rounded-full font-bold shadow-lg hover:bg-primary/90 transition inline-block">
@@ -102,69 +86,140 @@
             </a>
         </div>
     </main>
+<!-- Hero -->
+<section class="relative overflow-hidden">
 
-    <!-- FEATURES -->
-    <section id="features" class="mt-24 px-6 max-w-6xl mx-auto scroll-mt-32">
-        <h4 class="text-primary text-sm font-bold uppercase text-center">Core Features</h4>
-        <div class="h-1 w-12 bg-primary/20 mx-auto rounded-full mt-2"></div>
+  <!-- Soft background glow -->
+  <div class="absolute inset-0 bg-gradient-to-r from-primarySoft via-white to-primarySoft opacity-70"></div>
+  <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(10,155,99,0.08),transparent_60%)]"></div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10">
+  <div class="relative max-w-4xl mx-auto px-6 pt-28 pb-36 text-center">
 
-            <div class="flex gap-4 p-6 bg-white rounded-xl border shadow-sm">
-                <div class="w-14 h-14 bg-primary/10 text-primary flex items-center justify-center rounded-full">
-                    <span class="material-symbols-outlined text-3xl">edit_note</span>
-                </div>
-                <div>
-                    <h3 class="font-bold text-lg">Journaling</h3>
-                    <p class="text-sm text-[#4c869a]">A private, encrypted space for your thoughts.</p>
-                </div>
-            </div>
+    <h1 class="text-6xl font-bold mb-6">
+      Slow down. Reflect. Rest.
+    </h1>
 
-            <div class="flex gap-4 p-6 bg-white rounded-xl border shadow-sm">
-                <div class="w-14 h-14 bg-lavender/10 text-lavender flex items-center justify-center rounded-full">
-                    <span class="material-symbols-outlined text-3xl">air</span>
-                </div>
-                <div>
-                    <h3 class="font-bold text-lg">Breathing</h3>
-                    <p class="text-sm text-[#4c869a]">Guided rhythmic exercises for instant calm.</p>
-                </div>
-            </div>
+    <p class="text-lg text-textMuted max-w-2xl mx-auto mb-6">
+      Moodmate is a reflective journaling and emotional grounding space.
+      A gentle place to pause, observe your emotions, and reconnect with yourself.
+    </p>
 
-            <div class="flex gap-4 p-6 bg-white rounded-xl border shadow-sm">
-                <div class="w-14 h-14 bg-primary/10 text-primary flex items-center justify-center rounded-full">
-                    <span class="material-symbols-outlined text-3xl">forum</span>
-                </div>
-                <div>
-                    <h3 class="font-bold text-lg">AI Companion</h3>
-                    <p class="text-sm text-[#4c869a]">Empathetic support available 24/7.</p>
-                </div>
-            </div>
+    <p class="text-textMuted max-w-xl mx-auto mb-10">
+      Write freely. Notice your inner state. Receive calm AI-generated audio reflections that help you feel centered and present.
+    </p>
 
-            <div class="flex gap-4 p-6 bg-white rounded-xl border shadow-sm">
-                <div class="w-14 h-14 bg-emerald-100 text-emerald-500 flex items-center justify-center rounded-full">
-                    <span class="material-symbols-outlined text-3xl">monitoring</span>
-                </div>
-                <div>
-                    <h3 class="font-bold text-lg">Reflections</h3>
-                    <p class="text-sm text-[#4c869a]">Understand and track your emotional trends.</p>
-                </div>
-            </div>
+    <!-- Buttons -->
+    <div class="flex items-center justify-center gap-5">
+      <a href="/register"
+         class="px-8 py-4 rounded-full bg-primary text-white font-semibold flex items-center gap-2 shadow-lg shadow-primary/30">
+        Start journaling →
+      </a>
 
-        </div>
-    </section>
+      <a href="/login"
+         class="px-8 py-4 rounded-full border-2 border-primary text-primary font-semibold">
+        Login
+      </a>
+    </div>
 
-    <!-- FOOTER -->
-    <footer class="mt-24 bg-gradient-to-br from-primary/10 to-lavender/10 p-10 text-center">
-        <h3 class="text-xl font-black mb-2">MoodMate</h3>
-        <p class="text-sm text-[#4c869a] mb-6">
-            Your daily space for calm, clarity, and care 💙
-        </p>
+  </div>
+</section>
 
-        <p class="text-xs text-[#4c869a]">
-            © 2026 MoodMate Wellness Inc. All rights reserved.
-        </p>
-    </footer>
 
-</div>
+<!-- How it works -->
+<section class="max-w-5xl mx-auto px-6 py-20">
+
+  <h2 class="text-3xl text-center font-semibold mb-4">
+    A calm daily ritual
+  </h2>
+
+  <p class="text-textMuted text-center max-w-xl mx-auto mb-14">
+    Moodmate helps you slow your thoughts, build emotional awareness, and develop a simple reflective habit.
+  </p>
+
+  <div class="grid md:grid-cols-3 gap-6">
+
+    <div class="bg-white p-6 rounded-2xl border border-neutral-200 text-center">
+      <h3 class="font-semibold mb-2">Journal</h3>
+      <p class="text-textMuted text-sm">
+        Write your thoughts freely in a private, quiet space.
+      </p>
+    </div>
+
+    <div class="bg-white p-6 rounded-2xl border border-neutral-200 text-center">
+      <h3 class="font-semibold mb-2">Reflect</h3>
+      <p class="text-textMuted text-sm">
+        Explore your feelings through gentle AI-guided conversation.
+      </p>
+    </div>
+
+    <div class="bg-white p-6 rounded-2xl border border-neutral-200 text-center">
+      <h3 class="font-semibold mb-2">Listen</h3>
+      <p class="text-textMuted text-sm">
+        Receive soft audio reflections that help ground your mind.
+      </p>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- Philosophy Section -->
+<section class="bg-primarySoft py-20">
+  <div class="max-w-4xl mx-auto px-6 text-center">
+
+    <h2 class="text-3xl font-semibold mb-4">
+      A gentle space for self-observation
+    </h2>
+
+    <p class="text-textMuted max-w-2xl mx-auto">
+      Moodmate is not therapy and does not provide medical advice.  
+      It is a calm reflective tool designed to help you notice your emotions,
+      build self-awareness, and create space between feeling and reaction.
+    </p>
+
+  </div>
+</section>
+
+
+<!-- CTA -->
+<section class="py-20 text-center">
+  <h2 class="text-3xl font-semibold mb-3">
+    Begin your reflection practice
+  </h2>
+
+  <p class="text-textMuted mb-8">
+    Simple. Private. Calm. Always at your pace.
+  </p>
+
+  <a href="/register"
+     class="px-8 py-4 rounded-full bg-primary text-white font-semibold shadow-lg shadow-primary/30">
+    Create your space
+  </a>
+</section>
+
+
+<!-- Footer -->
+<footer class="border-t border-neutral-200 py-10">
+  <div class="max-w-6xl mx-auto px-6 text-center text-sm text-textMuted space-y-3">
+
+    <div class="flex justify-center items-center gap-2">
+      <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm">
+        M
+      </div>
+      <span class="font-medium text-textMain">Moodmate</span>
+    </div>
+
+    <p>
+      Moodmate is a reflective journaling and emotional grounding platform.
+      Designed for calm self-observation and mindful awareness.
+    </p>
+
+    <p class="text-xs">
+      © {{ year|default:"2026" }} Moodmate. All rights reserved.
+    </p>
+
+  </div>
+</footer>
+
 </body>
 </html>
