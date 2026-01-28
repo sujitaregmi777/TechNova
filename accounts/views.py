@@ -164,21 +164,6 @@ def login_view(request):
 
     return render(request, "accounts/login.html")
 
-def guest_login(request):
-    username = f"guest_{uuid.uuid4().hex[:10]}"
-
-    user = User.objects.create_user(username=username)
-    user.set_unusable_password()
-    user.save()
-
-    auth_login(
-        request,
-        user,
-        backend="django.contrib.auth.backends.ModelBackend"
-    )
-
-    return redirect("dashboard")
-
 @login_required
 def dashboard(request):
     streak = None
