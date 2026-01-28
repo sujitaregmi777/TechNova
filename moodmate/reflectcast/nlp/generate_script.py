@@ -65,6 +65,7 @@ def create_script(reflection: str, emotion: str,user_id: str) -> str:
         prompt = build_prompt(reflection, emotion, memory_context)
 
         # Generate script using OpenAI chat completion
+        client = get_openai_client()
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[

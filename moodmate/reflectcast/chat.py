@@ -1,13 +1,13 @@
 import os
 from openai import OpenAI
 
-# Load key from .env
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-if not OPENAI_API_KEY:
-    raise Exception("OPENAI_API_KEY environment variable not set")
 
-# ✅ New OpenAI client
-client = OpenAI(api_key=OPENAI_API_KEY)
+def get_openai_client():
+    """Get OpenAI client, checking for API key."""
+    OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+    if not OPENAI_API_KEY:
+        raise Exception("OPENAI_API_KEY environment variable not set")
+    return OpenAI(api_key=OPENAI_API_KEY)
 
 
 def chat_with_openai(conversation):
@@ -19,6 +19,7 @@ def chat_with_openai(conversation):
     ]
     """
     try:
+        client = get_openai_client()
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=conversation,

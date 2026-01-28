@@ -1,13 +1,13 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import authenticate
-from django.contrib.auth import login as auth_login
+from django.contrib.auth import authenticate, login as auth_login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.conf import settings
 from django.core.mail import send_mail
 from .models import EmailOTP
-import random,uuid
+import random
+import uuid
 import json
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -16,6 +16,28 @@ from .forms import ReflectionForm, CommentForm
 from .utils import check_content,update_streak
 from .models import Article, Comment
 
+
+
+
+def index(request):
+    reviews = [
+        {
+            "text": "MoodMate helps me understand my emotions better every day. The mood-based suggestions are calming.",
+            "name": "Sarah Thompson",
+            "role": "Wellness App User",
+        },
+        {
+            "text": "After long workdays, MoodMate helps me pause and reflect. It’s simple, supportive, and easy to use.",
+            "name": "Michael Rodriguez",
+            "role": "Busy Professional",
+        },
+        {
+            "text": "I really like how MoodMate adapts based on how I’m feeling. It feels personal and comforting.",
+            "name": "Emily Chen",
+            "role": "Student",
+        },
+    ]
+    return render(request, "accounts/index.html", {"reviews": reviews})
 
 
 def generate_otp():
@@ -40,20 +62,15 @@ def register(request):
             messages.error(request, "Email already registered.")
             return render(request, "accounts/register.html")
 
-        # Create inactive user
         user = User.objects.create_user(
             username=email,
             email=email,
             password=password1,
-            is_active=False
+            is_active=False,
         )
 
         otp = generate_otp()
-
-        EmailOTP.objects.update_or_create(
-            user=user,
-            defaults={"otp": otp}
-        )
+        EmailOTP.objects.update_or_create(user=user, defaults={"otp": otp})
 
         send_mail(
             subject="Moodmate – Verify Your Account",
@@ -64,7 +81,6 @@ def register(request):
         )
 
         request.session["otp_user_id"] = user.id
-
         messages.success(request, "OTP sent to your email.")
         return redirect("verify_otp")
 
@@ -73,7 +89,6 @@ def register(request):
 
 def verify_otp(request):
     user_id = request.session.get("otp_user_id")
-
     if not user_id:
         messages.error(request, "Session expired. Please register again.")
         return redirect("register")
@@ -91,19 +106,12 @@ def verify_otp(request):
             messages.error(request, "Invalid OTP.")
             return render(request, "accounts/verify_otp.html")
 
-        # Activate user
         user = otp_obj.user
         user.is_active = True
         user.save()
 
-        # Login user
-        auth_login(
-            request,
-            user,
-            backend="django.contrib.auth.backends.ModelBackend"
-        )
+        auth_login(request, user, backend="django.contrib.auth.backends.ModelBackend")
 
-        # Cleanup
         otp_obj.delete()
         request.session.pop("otp_user_id", None)
 
@@ -115,7 +123,6 @@ def verify_otp(request):
 
 def resend_otp(request):
     user_id = request.session.get("otp_user_id")
-
     if not user_id:
         messages.error(request, "Session expired. Please register again.")
         return redirect("register")
@@ -144,11 +151,7 @@ def login_view(request):
         email = request.POST.get("email")
         password = request.POST.get("password")
 
-        user = authenticate(
-            request,
-            username=email,
-            password=password
-        )
+        user = authenticate(request, username=email, password=password)
 
         if user is None:
             messages.error(request, "Invalid email or password.")
@@ -197,20 +200,6 @@ def index(request):
     return render(request, "accounts/index.html", {
         "reviews": reviews
     })
-    #         messages.error(
-    # messages.error(
-    #             request,
-    #             "Your account is not verified. Please verify your email."
-    #         )
-    #         return render(request, "accounts/login.html")
-
-    #     auth_login(request, user)
-    #     print(request.POST)
-    #     messages.success(request, "Welcome back!")
-    #     return redirect("dashboard")  # must exist
-
-    # return render(request, "accounts/login.html")
-
 
 
 @csrf_exempt
