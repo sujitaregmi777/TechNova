@@ -1,68 +1,35 @@
-import os
 import datetime
-import random
-from dotenv import load_dotenv
-
+from moodmate.reflectcast.nlp.ollama_client import ollama_generate
 from moodmate.reflectcast.nlp.vector_store import add_reflection, get_similar_reflections
-
-# Try Gemini if available
-try:
-    from google import genai
-    GEMINI_AVAILABLE = True
-except:
-    GEMINI_AVAILABLE = False
-
-load_dotenv()
-GEMINI_KEY = os.getenv("GEMINI_API_KEY")
-
-if GEMINI_AVAILABLE and GEMINI_KEY:
-    client = genai.Client(api_key=GEMINI_KEY)
-else:
-    client = None
-
-
-OPENING_LINES = [
-    "Hello, gentle soul.",
-    "Welcome back, dear friend.",
-    "Take a slow breath with me.",
-    "Settle into this quiet moment."
-]
-
-CLOSING_LINES = [
-    "You are safe. Rest well.",
-    "I’m here whenever you need me.",
-    "Let the day drift away peacefully.",
-    "You are cared for. Good night."
-]
 
 
 def clean_text(text):
-    return text.strip()
+    """Remove weird quotes and formatting artifacts."""
+    return (text.replace("’", "'")
+                .replace("‘", "'")
+                .replace("“", '"')
+                .replace("”", '"')
+                .replace("\u200b", '')
+                .strip())
 
 
-def build_local_script(reflection, emotion, memory_context):
-    """Offline poetic generator using reflection + memory"""
-
-    opening = random.choice(OPENING_LINES)
-    closing = random.choice(CLOSING_LINES)
-
-    memory_line = ""
-    if memory_context:
-        memory_line = "I remember you’ve felt similar moments before. "
-
+def build_prompt(reflection: str, emotion: str, memory_context: str) -> str:
     return (
-        f"{opening} "
-        f"Tonight you shared feeling {emotion}. "
-        f"{memory_line}"
-        f"Your words matter: '{reflection[:80]}...'. "
-        f"Let yourself soften. "
-        f"{closing}"
+        f"You are a mate that reflect and provide insights to ground you.\n\n"
+        f"The user shared this reflection today about feeling {emotion}:\n"
+        f"\"\"\"\n{reflection}\n\"\"\"\n\n"
+        f"Here are some past reflections to personalize the response:\n{memory_context}\n\n"
+        "Write a poetic, emotionally comforting bedtime podcast script (~60 words). "
+        "The tone should be gentle, calming, and empathetic. "
+        "Begin with a warm, gentle greeting to invite the listener in. "
+        "End with a peaceful, soothing closing line that makes the listener feel safe and cared for. "
+        "Return only the script text. No labels or formatting."
     )
 
 
 def create_script(reflection: str, emotion: str, user_id: str) -> str:
     try:
-        # Save to vector DB
+        # Store reflection in vector memory
         add_reflection(
             user_id=user_id,
             reflection_text=reflection,
@@ -72,51 +39,37 @@ def create_script(reflection: str, emotion: str, user_id: str) -> str:
             episode_script=None
         )
 
-        # Memory retrieval
+        # Retrieve similar past reflections
         similar_docs = get_similar_reflections(reflection, user_id=user_id)
         memory_contexts = []
 
         for doc in similar_docs:
+            meta = doc.get("metadata", {})
             text = doc.get("document", "")
-            if text != reflection:
-                memory_contexts.append(text)
-
-        memory_context = "\n".join(memory_contexts)
-
-        # --- Try Gemini if available ---
-        if client:
-            try:
-                prompt = (
-                    f"The user shared this reflection about feeling {emotion}:\n"
-                    f"{reflection}\n\n"
-                    f"Past reflections:\n{memory_context}\n\n"
-                    "Write a gentle, comforting bedtime podcast script (~60 words)."
+            if text and text != reflection:
+                memory_contexts.append(
+                    f"On {meta.get('date', 'a past day')}, the user once reflected: \"{text[:120]}...\""
                 )
 
-                response = client.models.generate_content(
-                    model="gemini-2.0-flash",
-                    contents=prompt
-                )
+        memory_context = "\n".join(memory_contexts) if memory_contexts else \
+            "The user has felt deeply before, even if no specific memory is found."
 
-                script = response.text.strip()
-                if script:
-                    return clean_text(script)
+        # Build prompt
+        prompt = build_prompt(reflection, emotion, memory_context)
 
-            except Exception:
-                print("⚠️ Gemini unavailable → using offline script generator")
+        # ---- Generate using Ollama ----
+        script = ollama_generate(prompt)
 
-        # --- Always safe offline fallback ---
-        return clean_text(build_local_script(reflection, emotion, memory_context))
+        if script:
+            return clean_text(script)
+
+        raise Exception("Empty Ollama response")
 
     except Exception as e:
-        print("⚠️ Script system fallback triggered:", e)
-        return clean_text(build_local_script(reflection, emotion, ""))
-
-
-# Test
-if __name__ == "__main__":
-    print(create_script(
-        "I felt overwhelmed but proud I finished my work.",
-        "motivated",
-        "test_user"
-    ))
+        print("⚠️ Script generator fallback:", e)
+        return clean_text(
+            "Hello gentle soul. Take a slow breath. "
+            "You’ve done enough for today. "
+            "Let your body soften and your thoughts quiet. "
+            "You are safe, you are cared for, and you may rest now."
+        )

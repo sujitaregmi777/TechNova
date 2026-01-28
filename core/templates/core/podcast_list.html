@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}Your Insights · MoodMate{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto mt-12">
+
+  <!-- Page Header -->
+  <div class="flex justify-between items-center mb-8">
+    <h1 class="text-3xl font-bold">Your Insight Podcasts</h1>
+
+    <a href="{% url 'journal_create' %}"
+       class="px-5 py-2 rounded-xl bg-[var(--primary)] text-white text-sm font-medium">
+      + New Reflection
+    </a>
+  </div>
+
+  {% if podcasts %}
+    <div class="grid gap-4">
+
+      {% for podcast in podcasts %}
+
+        <!-- Ready Podcast (Clickable) -->
+        {% if podcast.status == "ready" %}
+          <a href="{% url 'listen_podcast' podcast.id %}"
+             class="block p-5 rounded-2xl border border-[var(--border)]
+                    bg-[var(--surface)]
+                    hover:border-[var(--primary)]
+                    hover:shadow-md transition">
+
+            <div class="flex items-center justify-between">
+              <div>
+                <h2 class="font-semibold text-lg">
+                  🎧 {{ podcast.title }}
+                </h2>
+                <p class="text-sm text-[var(--muted)]">
+                  Tap to listen to your insights
+                </p>
+              </div>
+
+              <span class="text-green-500 text-sm font-medium">
+                Ready
+              </span>
+            </div>
+          </a>
+        {% else %}
+
+        <!-- Processing Podcast (Not clickable) -->
+          <div class="p-5 rounded-2xl border border-[var(--border)]
+                      bg-[var(--surface)]
+                      opacity-60 cursor-not-allowed">
+
+            <div class="flex items-center justify-between">
+              <div>
+                <h2 class="font-semibold text-lg">
+                  Preparing your insights...
+                </h2>
+                <p class="text-sm text-[var(--muted)]">
+                  This will be ready soon
+                </p>
+              </div>
+
+              <span class="text-yellow-500 text-sm font-medium">
+                Processing
+              </span>
+            </div>
+          </div>
+
+        {% endif %}
+
+      {% endfor %}
+    </div>
+
+  {% else %}
+    <!-- Empty State -->
+    <div class="text-center mt-20">
+      <h2 class="text-xl font-semibold mb-3">No insights yet</h2>
+      <p class="text-[var(--muted)] mb-6">
+        Write a reflection to generate your first insight podcast.
+      </p>
+      <a href="{% url 'journal_create' %}"
+         class="px-6 py-3 rounded-xl bg-[var(--primary)] text-white font-medium">
+        Start Writing
+      </a>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

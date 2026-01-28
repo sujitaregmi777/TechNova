@@ -1,21 +1,20 @@
-from google import genai
-import os
 
-client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
-def generate_podcast_title(reflection: str, mood: str) -> str:
+from moodmate.reflectcast.nlp.ollama_client import ollama_generate
+
+def generate_podcast_title(reflection: str, emotion: str) -> str:
     prompt = (
-        f"Generate a short, creative podcast title of 2 to 3 words "
-        f"for a {mood} reflection: {reflection}. "
-        f"Return only the title text."
+        "You are a gentle journaling assistant.\n"
+        "Create one short, meaningful title (max 2 words) that summarizes this reflection.\n"
+        "Return ONLY the title text.\n\n"
+        f"Reflection:\n{reflection}"
     )
 
-    try:
-        response = client.models.generate_content(
-            model="gemini-1.5-flash-8b",
-            contents=prompt
-        )
-        return response.text.strip()
-    except Exception as e:
-        print("Gemini failed:", e)
-        return "Untitled Reflection"
+    title = ollama_generate(prompt)
+
+    if title:
+        return title.strip()
+
+    # Fallback title
+    return f"A Moment of {emotion.capitalize()}"
+ 
