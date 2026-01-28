@@ -6,9 +6,11 @@ from django.contrib import messages
 from django.conf import settings
 from django.core.mail import send_mail
 from .models import EmailOTP
-from .forms import CustomUserCreationForm
 import random
 import uuid
+import json
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 
 
 def index(request):
@@ -34,40 +36,6 @@ def index(request):
 
 def generate_otp():
     return str(random.randint(100000, 999999))
-
-
-def register_view(request):
-    if request.method == "POST":
-        data = request.POST.copy()
-        email = data.get("email")
-        if email:
-            data["username"] = email
-
-        form = CustomUserCreationForm(data)
-        if form.is_valid():
-            user = form.save(commit=False)
-            user.email = email
-            user.username = email
-            user.is_active = False
-            user.save()
-
-            otp = generate_otp()
-            EmailOTP.objects.create(user=user, otp=otp)
-
-            send_mail(
-                subject="Verify your Moodmate account",
-                message=f"Your OTP is {otp}",
-                from_email="no-reply@moodmate.com",
-                recipient_list=[user.email],
-            )
-
-            request.session["otp_user_id"] = user.id
-            messages.success(request, "We have sent a verification code to your email.")
-            return redirect("verify_otp")
-    else:
-        form = CustomUserCreationForm()
-
-    return render(request, "accounts/register.html", {"form": form})
 
 
 def register(request):
@@ -194,10 +162,6 @@ def login_view(request):
     return render(request, "accounts/login.html")
 
 
-@login_required
-def dashboard(request):
-    return render(request, "accounts/dashboard.html")
-
 
 def guest_login(request):
     username = f"guest_{uuid.uuid4().hex[:10]}"
@@ -205,5 +169,55 @@ def guest_login(request):
     user.set_unusable_password()
     user.save()
 
-    auth_login(request, user, backend="django.contrib.auth.backends.ModelBackend")
+    auth_login(
+        request,
+        user,
+        backend="django.contrib.auth.backends.ModelBackend"
+    )
+
     return redirect("dashboard")
+
+@login_required
+def dashboard(request):
+    return render (request, "accounts/dashboard.html")
+
+def index(request):
+    reviews = [
+        {
+            "text": "MoodMate helps me understand my emotions better every day. The mood-based suggestions are calming.",
+            "name": "Sarah Thompson",
+            "role": "Wellness App User",
+        },
+        {
+            "text": "After long workdays, MoodMate helps me pause and reflect. It’s simple, supportive, and easy to use.",
+            "name": "Michael Rodriguez",
+            "role": "Busy Professional",
+        },
+        {
+            "text": "I really like how MoodMate adapts based on how I’m feeling. It feels personal and comforting.",
+            "name": "Emily Chen",
+            "role": "Student",
+        },
+    ]
+
+    return render(request, "accounts/index.html", {
+        "reviews": reviews
+    })
+
+
+@csrf_exempt
+@login_required
+def set_mood(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        request.session["current_mood"] = data.get("mood")
+        return JsonResponse({"status": "ok"})
+
+    return JsonResponse({"status": "invalid"}, status=400)
+    
+
+def breathing(request):
+    return render(request, "accounts/breathing.html")
+
+
+

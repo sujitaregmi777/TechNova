@@ -39,17 +39,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.sites',
-
-    # Local apps
-    'accounts',
     'core',
-
-    # Third-party apps
-    'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
-    'allauth.socialaccount.providers.google',
+     "django.contrib.sites",
+     'accounts',
+     "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.google",
+    'user_settings.apps.UserSettingsConfig',
+    
 ]
 
 
@@ -164,7 +162,7 @@ EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 
 
 
-DEFAULT_FROM_EMAIL = "RoomSiftay <roomsiftay@gmail.com>"
+DEFAULT_FROM_EMAIL = "Moodmate <moodmate@gmail.com>"
 
 
 SESSION_COOKIE_AGE = 1209600  
