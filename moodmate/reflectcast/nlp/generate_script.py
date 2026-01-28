@@ -38,7 +38,8 @@ def create_script(reflection: str, emotion: str, user_id: str) -> str:
             theme=None,
             episode_script=None
         )
-
+        print(" Stored reflection in vector store.")
+        print(" Retrieving similar reflections...")
         # Retrieve similar past reflections
         similar_docs = get_similar_reflections(reflection, user_id=user_id)
         memory_contexts = []
@@ -58,9 +59,11 @@ def create_script(reflection: str, emotion: str, user_id: str) -> str:
         prompt = build_prompt(reflection, emotion, memory_context)
 
         # ---- Generate using Ollama ----
+        print(" Generating script....")
         script = ollama_generate(prompt)
 
         if script:
+            print(" Generated Script using Ollama:", script)
             return clean_text(script)
 
         raise Exception("Empty Ollama response")

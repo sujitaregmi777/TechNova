@@ -11,8 +11,8 @@ def generate_podcast_title(reflection: str, emotion: str) -> str:
     )
 
     title = ollama_generate(prompt)
-
     if title:
+        print(" Generated Title:", title)
         return title.strip()
 
     # Fallback title

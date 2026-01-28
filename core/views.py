@@ -5,6 +5,8 @@ from threading import Thread
 from core.models import Journal, Podcast
 from core.forms import JournalForm
 
+from moodmate.reflectcast.audio.generate_audio import text_to_podcast
+from moodmate.reflectcast.audio.mix_audio import mix_voice_with_ambient
 from moodmate.reflectcast.input.handlers import process_input
 from moodmate.reflectcast.nlp.generate_script import create_script
 from moodmate.reflectcast.nlp.generate_title import generate_podcast_title
@@ -15,24 +17,36 @@ from moodmate.reflectcast.nlp.generate_title import generate_podcast_title
 # ---------------------------------------------------
 
 def generate_podcast_assets(podcast_id, journal_content, journal_mood, user_id):
+    print(f"[Podcast Worker Started (ID: {podcast_id})]")
     podcast = Podcast.objects.get(id=podcast_id)
 
+    print(f'Generating Title...')
     # Generate title
     title = generate_podcast_title(
         reflection=journal_content,
         emotion=journal_mood
     )
-
+    print(" Generating script ....")
     # Generate script
     script = create_script(
         reflection=journal_content,
         emotion=journal_mood,
         user_id=user_id
     )
+    # Audio
+    audio_path = text_to_podcast(script, journal_mood)
+    
+    #Mixing ambient sound
+    final_audio_path = mix_voice_with_ambient(
+            voice_path=audio_path,
+            mood=journal_mood,
+            podcast_id=podcast_id
+        )
 
     # Save generated content
     podcast.title = title
     podcast.script = script
+    podcast.audio_file = final_audio_path
     podcast.status = "ready"
     podcast.save()
 

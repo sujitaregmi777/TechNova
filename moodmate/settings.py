@@ -165,3 +165,5 @@ DEFAULT_FROM_EMAIL = "Moodmate <moodmate@gmail.com>"
 SESSION_COOKIE_AGE = 1209600  
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"

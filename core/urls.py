@@ -1,4 +1,6 @@
 from django.urls import path
+from django.conf.urls.static import static
+from django.conf import settings
 from accounts.views import dashboard
 from core.views import (
     enter_journal,
@@ -25,3 +27,5 @@ urlpatterns = [
 
     path("podcast/processing/<int:pk>/", podcast_processing, name="podcast_processing"),
 ]
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

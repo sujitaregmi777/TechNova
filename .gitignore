@@ -1,33 +1,76 @@
-# Python bytecode
-*.pyc
+# ---- Python ----
 __pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+pip-wheel-metadata/
 
-# VS Code settings
-.vscode/
-
-# Virtual environments
-env310/
-venv/
-
-# Environment variables
-.env
-.env.*
-
-# Django database
-db.sqlite3
-
-# Django migration cache only (keep migration .py files!)
-*/migrations/__pycache__/
-*/migrations/*.pyc
-*/migrations/*.py
-__pycache__/
-*.pyc
+# ---- Virtual Environment ----
 venv/
 env/
+ENV/
+.venv/
 
-# Backup folders
-backup_untracked/
+# ---- Django ----
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+/media/
+/staticfiles/
 
-# OS files
+# ---- Migrations (keep if you want, remove if you don't) ----
+# */migrations/*.py
+# !*/migrations/__init__.py
+
+# ---- Environment variables ----
+.env
+
+# ---- IDE / Editor ----
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+
+# ---- OS ----
 .DS_Store
 Thumbs.db
+desktop.ini
+
+# ---- Audio / Model files ----
+*.wav
+*.mp3
+*.ogg
+
+# ---- AI / Model caches ----
+/moodmate/reflectcast/audio/outputs/
+/moodmate/reflectcast/nlp/tfidf_store/
+
+# ---- Node (if ever used) ----
+node_modules/
+
+# ---- Pip cache ----
+.pip-cache/
+
+# ---- Temporary files ----
+*.tmp
+*.temp
+# ---- Generated Media / Audio ----
+media/
+MEDIA_ROOT/
+*.wav
+*.mp3
+*.ogg
+*.flac
+*.m4a
+/media/
+/media/audio/
+/reflectcast/audio/outputs/
