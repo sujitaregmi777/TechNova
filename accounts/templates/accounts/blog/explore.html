@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Gentle Reads · MoodMate{% endblock %}
+
+{% block content %}
+
+<section class="space-y-10">
+
+  <!-- Heading -->
+  <div class="space-y-2">
+    <h2 class="text-3xl font-bold">Gentle Reads</h2>
+    <p class="text-[var(--muted)] max-w-xl">
+      Curated reflections and articles designed to be read slowly.
+    </p>
+  </div>
+
+  <!-- Cards -->
+  <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for a in articles %}
+    <a href="{% url 'article_detail' a.id %}"
+       class="group rounded-3xl overflow-hidden
+              bg-[var(--surface)] border border-[var(--border)]
+              hover:border-[var(--primary)]
+              transition">
+
+      {% if a.image %}
+      <div class="aspect-[4/3] overflow-hidden">
+        <img
+          src="{{ a.image.url }}"
+          alt="{{ a.title }}"
+          class="w-full h-full object-cover
+                 transition group-hover:scale-[1.03]"
+        />
+      </div>
+      {% endif %}
+
+      <div class="p-5">
+        <h3 class="text-lg font-semibold leading-snug">
+          {{ a.title }}
+        </h3>
+
+        <p class="mt-1 text-xs text-[var(--muted)]">
+          Curated · {{ a.created_at|date:"M d, Y" }}
+        </p>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+<div class="pt-10">
+  <a href="{% url 'reflections_list' %}"
+     class="inline-flex items-center gap-2
+            text-sm font-medium text-[var(--primary)]
+            hover:underline">
+    See what others are sharing →
+  </a>
+</div>
+
+</section>
+
+{% endblock %}

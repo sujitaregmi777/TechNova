@@ -1,10 +1,13 @@
+<<<<<<< HEAD
+# accounts/urls.py
 from django.urls import path
-from . import views
 from django.contrib.auth import views as auth_views
 
+from . import views
+
 urlpatterns = [
-    path('', views.index, name='index'),
     path("register/", views.register, name="register"),
+    path("", views.index, name="index"),
     path('login/', views.login_view, name='login'),
     path('verify-otp/', views.verify_otp, name='verify_otp'),
     path('resend-otp/', views.resend_otp, name='resend_otp'),
@@ -41,8 +44,39 @@ urlpatterns = [
         ),
         name="password_reset_complete"
     ),
+    path("comments/<int:pk>/delete/",views.delete_comment,name="delete_comment"),
+
     path("set-mood/", views.set_mood, name="set_mood"),
-    path("breathing/", views.breathing, name="breathing")
+    path("breathing/", views.breathing, name="breathing"),
+    path("reflections/", views.reflections_list, name="reflections_list"),
+    path("reflections/new/", views.create_reflection, name="create_reflection"),
+    path("reflections/<int:pk>/", views.reflection_detail, name="reflection_detail"),
+    path("reflections/<int:pk>/edit/", views.edit_reflection, name="edit_reflection"),
+    path("reflections/<int:pk>/comment/", views.add_comment, name="add_comment"),
+    path("explore/", views.explore, name="explore"),
+    path("read/<int:pk>/", views.article_detail, name="article_detail"),
+    path("blogs/", views.blogs, name="blogs"),
+    path("reflections/<int:pk>/delete/",views.delete_reflection,name="delete_reflection"),
+
+    
+
+
+
 ]
 
 
+=======
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('', views.index, name='index'),
+    path("register/", views.register, name="register"),
+    path('login/', views.login_view, name='login'),
+    path('verify-otp/', views.verify_otp, name='verify_otp'),
+    path('resend-otp/', views.resend_otp, name='resend_otp'),
+    path("dashboard/", views.dashboard, name="dashboard"),
+]
+
+
+>>>>>>> d77af2c (feat: implement journal functionality with CRUD operations and mood tracking)

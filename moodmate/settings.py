@@ -32,16 +32,17 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    # Django default apps
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    "django.contrib.sites",
+    'accounts',
     'core',
-     "django.contrib.sites",
-     'accounts',
-     "allauth",
+    "allauth",
     "allauth.account",
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
@@ -60,7 +61,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'moodmate.urls'
-SITE_ID = 3
+SITE_ID = 4
 
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
@@ -138,6 +139,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -165,5 +169,4 @@ DEFAULT_FROM_EMAIL = "Moodmate <moodmate@gmail.com>"
 SESSION_COOKIE_AGE = 1209600  
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 
-MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / "media"
+

@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}Reflections · MoodMate{% endblock %}
+
+{% block content %}
+<div class=" mx-auto space-y-12 ">
+
+  <!-- HEADER -->
+  <div class="space-y-2">
+    <h1 class="text-3xl font-bold text-red-300">Reflections</h1>
+    <p class="text-[var(--muted)]">
+      Personal writings shared gently by the community.
+    </p>
+  </div>
+
+  <!-- CTA -->
+  <div>
+    <a href="{% url 'create_reflection' %}"
+       class="inline-flex items-center gap-2
+              px-6 py-3 rounded-full
+              bg-[var(--primary)] text-white font-semibold">
+      Write a reflection
+    </a>
+  </div>
+
+  <!-- GRID (SAME FEEL AS GENTLE READS) -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+
+    {% for r in reflections %}
+    <a href="{% url 'reflection_detail' r.id %}"
+       class="group rounded-3xl overflow-hidden
+              bg-[var(--surface)]
+              border border-[var(--border)]
+              hover:border-[var(--primary)]
+              transition">
+
+      {% if r.image %}
+      <!-- IMAGE -->
+      <div class="aspect-[4/3] overflow-hidden">
+        <img
+          src="{{ r.image.url }}"
+          alt="{{ r.title }}"
+          class="w-full h-full object-cover
+                 transition group-hover:scale-[1.03]"
+        />
+      </div>
+      {% endif %}
+
+      <!-- CONTENT -->
+      <div class="p-5 space-y-2">
+
+        <h2 class="text-lg font-semibold leading-snug">
+          {{ r.title }}
+        </h2>
+
+        <p class="text-sm text-[var(--muted)] line-clamp-3">
+          {{ r.text }}
+        </p>
+
+        <p class="text-xs text-[var(--muted)]">
+          — {{ r.display_name }} · {{ r.created_at|date:"M d, Y" }}
+        </p>
+
+      </div>
+
+    </a>
+    {% endfor %}
+
+  </div>
+
+</div>
+{% endblock %}

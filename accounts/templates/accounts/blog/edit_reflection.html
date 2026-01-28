@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% block title %}Edit Reflection · MoodMate{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 py-14 space-y-12">
+
+  <!-- HEADER -->
+  <header class="text-center space-y-3">
+    <h1 class="text-3xl font-semibold tracking-tight">
+      Edit your reflection
+    </h1>
+    <p class="text-sm text-[var(--muted)] max-w-md mx-auto">
+      Make changes gently. Everything will be saved when you’re ready.
+    </p>
+  </header>
+
+  <!-- FORM -->
+  <form method="post"
+        enctype="multipart/form-data"
+        class="space-y-10">
+    {% csrf_token %}
+
+    <!-- TITLE -->
+    <div class="space-y-3">
+      <label class="text-sm font-medium">
+        Title <span class="text-[var(--muted)]">(optional)</span>
+      </label>
+
+      <input
+        type="text"
+        name="title"
+        value="{{ form.title.value|default_if_none:'' }}"
+        placeholder="e.g. Feeling heavy today"
+        spellcheck="false"
+        class="w-full
+               rounded-2xl
+               bg-[var(--surface-alt)]
+               border border-[var(--border)]
+               px-5 py-3
+               text-base text-[var(--text)]
+               placeholder-[var(--muted)]
+               focus:outline-none
+               focus:border-[var(--primary)]
+               focus:ring-2 focus:ring-[var(--primary)/20]
+               transition"
+        style="caret-color: var(--primary);"
+      />
+    </div>
+
+    <!-- REFLECTION -->
+    <div class="space-y-3">
+      <label class="text-sm font-medium">
+        Your reflection
+      </label>
+
+      <textarea
+        name="text"
+        rows="8"
+        id="reflection-text"
+        placeholder="Write whatever is coming to you right now…"
+        spellcheck="false"
+        class="w-full min-h-[15rem]
+               rounded-2xl
+               bg-[var(--surface-alt)]
+               border border-[var(--border)]
+               px-5 py-4
+               text-base text-[var(--text)]
+               placeholder-[var(--muted)]
+               leading-relaxed
+               resize-none
+               focus:outline-none
+               focus:border-[var(--primary)]
+               focus:ring-2 focus:ring-[var(--primary)/20]
+               transition"
+        style="caret-color: var(--primary);"
+      >{{ form.text.value|default_if_none:'' }}</textarea>
+
+      <p class="text-xs text-[var(--muted)]">
+        You can rewrite, remove, or add anything.
+      </p>
+    </div>
+
+    <!-- IMAGE -->
+    <div class="space-y-3">
+      <label class="text-sm font-medium">
+        Image <span class="text-[var(--muted)]">(optional)</span>
+      </label>
+
+      {% if reflection.image %}
+      <div class="flex items-center gap-4">
+        <img
+          src="{{ reflection.image.url }}"
+          alt="Current image"
+          class="w-24 h-24 object-cover rounded-xl
+                 border border-[var(--border)]">
+
+        <div class="text-sm text-[var(--muted)] leading-snug">
+          <p>Current image</p>
+          <p class="text-xs">
+            Uploading a new image will replace this one.
+          </p>
+        </div>
+      </div>
+      {% endif %}
+
+      {{ form.image }}
+    </div>
+
+    <!-- ANONYMOUS -->
+    <label class="flex items-start gap-3 text-sm">
+      {{ form.is_anonymous }}
+      <span class="text-[var(--muted)]">
+        Post anonymously
+      </span>
+    </label>
+
+    <!-- ACTIONS -->
+    <div class="pt-8 flex items-center justify-between">
+
+      <a href="{% url 'reflection_detail' reflection.id %}"
+         class="text-sm text-[var(--muted)] hover:underline">
+        ← Discard changes
+      </a>
+
+      <button
+        type="submit"
+        class="px-6 py-3 rounded-2xl
+               bg-[var(--primary)] text-white
+               font-semibold hover:opacity-90
+               transition">
+        Save changes
+      </button>
+
+    </div>
+
+  </form>
+</div>
+{% endblock %}

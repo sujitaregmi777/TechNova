@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+{% block title %}{{ reflection.title }} · MoodMate{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 py-16 space-y-16">
+
+  <!-- ARTICLE -->
+  <article class="space-y-10">
+
+    {% if reflection.image %}
+      <img
+        src="{{ reflection.image.url }}"
+        alt="{{ reflection.title }}"
+        class="w-full h-80 object-cover rounded-3xl
+               border border-[var(--border)]">
+    {% endif %}
+
+    <!-- HEADER -->
+    <header class="space-y-4 max-w-2xl mx-auto text-center">
+      <h1 class="text-3xl md:text-4xl font-semibold leading-tight">
+        {{ reflection.title }}
+      </h1>
+
+      <p class="text-sm text-[var(--muted)]">
+        — {{ reflection.display_name }} ·
+        {{ reflection.created_at|date:"F d, Y" }}
+      </p>
+    </header>
+
+    <!-- CONTENT -->
+    <div
+      class="max-w-2xl mx-auto
+             text-base md:text-lg
+             leading-relaxed md:leading-loose
+             space-y-6">
+      {{ reflection.text|linebreaks }}
+    </div>
+
+  </article>
+
+  <!-- COMMENTS -->
+  <section class="max-w-2xl mx-auto space-y-8">
+
+    <h2 class="text-xl font-semibold">
+      Comments ({{ reflection.comments.count }})
+    </h2>
+
+{% for comment in reflection.comments.all %}
+  <div class="p-5 rounded-2xl border border-[var(--border)] flex justify-between gap-4">
+
+    <!-- Comment content -->
+    <div>
+      <p class="text-xs text-[var(--muted)] mb-2">
+        {{ comment.author.username }} ·
+        {{ comment.created_at|date:"M d, Y · H:i" }}
+      </p>
+      <p class="text-base leading-relaxed">
+        {{ comment.content }}
+      </p>
+    </div>
+
+    <!-- Delete button (only author sees this) -->
+    {% if comment.author == user %}
+      <form method="post" action="{% url 'delete_comment' comment.id %}">
+        {% csrf_token %}
+        <button
+          type="submit"
+          class="text-xs text-red-500 hover:underline">
+          Delete
+        </button>
+      </form>
+    {% endif %}
+
+  </div>
+{% empty %}
+  <p class="text-sm text-[var(--muted)]">
+    No comments yet. Be the first to respond kindly 🌱
+  </p>
+{% endfor %}
+
+
+  </section>
+
+  <!-- ADD COMMENT -->
+  {% if user.is_authenticated %}
+  <section class="max-w-2xl mx-auto space-y-4">
+
+    <form method="post" action="{% url 'add_comment' reflection.id %}">
+      {% csrf_token %}
+
+      <textarea
+        name="content"
+        rows="4"
+        id="comment-content"
+        placeholder="Respond with kindness…"
+        spellcheck="false"
+        class="w-full min-h-[8rem]
+               rounded-2xl
+               bg-[var(--surface-alt)]
+               border border-[var(--border)]
+               px-5 py-4
+               text-base text-[var(--text)]
+               placeholder-[var(--muted)]
+               leading-relaxed
+               resize-none
+               focus:outline-none
+               focus:border-[var(--primary)]
+               focus:ring-2 focus:ring-[var(--primary)/20]
+               transition"
+        style="caret-color: var(--primary);"
+      >{{ form.content.value|default_if_none:"" }}</textarea>
+
+      <div class="flex justify-end mt-4">
+        <button
+          type="submit"
+          class="px-5 py-2 rounded-full
+                 text-sm font-medium
+                 bg-[var(--primary)]
+                 text-white hover:opacity-90">
+          Post comment
+        </button>
+      </div>
+    </form>
+
+  </section>
+  {% else %}
+    <p class="text-center text-sm text-[var(--muted)]">
+      Please <a href="{% url 'login' %}" class="underline">log in</a> to leave a comment.
+    </p>
+  {% endif %}
+
+  
+
+  <!-- ACTIONS -->
+  <div
+    class="max-w-2xl mx-auto
+           flex items-center justify-between
+           pt-10 border-t border-[var(--border)]">
+
+    <a href="{% url 'reflections_list' %}"
+       class="text-sm text-[var(--muted)] hover:underline">
+      ← Back to reflections
+    </a>
+{% if user == reflection.author %}
+  <div class="flex gap-4">
+
+    <a href="{% url 'edit_reflection' reflection.id %}"
+       class="text-sm font-medium text-[var(--primary)] hover:underline">
+      Edit reflection
+    </a>
+
+    <form method="post" action="{% url 'delete_reflection' reflection.id %}">
+      {% csrf_token %}
+      <button
+        type="submit"
+        class="text-sm text-red-500 hover:underline">
+        Delete reflection
+      </button>
+    </form>
+
+  </div>
+{% endif %}
+
+  </div>
+
+</div>
+{% endblock %}

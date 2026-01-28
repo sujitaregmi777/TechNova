@@ -25,9 +25,21 @@ db.sqlite3-journal
 /media/
 /staticfiles/
 
-# ---- Migrations (keep if you want, remove if you don't) ----
-# */migrations/*.py
-# !*/migrations/__init__.py
+# Django migrations (optional to ignore)
+# Media files
+media/
+*/migrations/*.pyc
+# Django migration cache only (keep migration .py files!)
+*/migrations/__pycache__/
+*/migrations/*.pyc
+*/migrations/*.py
+__pycache__/
+*.pyc
+venv/
+env/
+# Django migration cache only (keep migration .py files!)
+*/migrations/__pycache__/
+*/migrations/*.pyc
 
 # ---- Environment variables ----
 .env
