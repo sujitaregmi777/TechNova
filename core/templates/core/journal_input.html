@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block title %}Reflection · MoodMate{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto flex flex-col gap-12">
+
+  <!-- Header -->
+  <section class="flex flex-col gap-3">
+    <h1 class="text-3xl sm:text-4xl font-bold leading-tight">
+      {% if form.instance.pk %}
+        Continue your reflection
+      {% else %}
+        A quiet space to write
+      {% endif %}
+    </h1>
+
+    <p class="text-[var(--muted)] max-w-xl">
+      There’s no right way to do this. Just notice what feels present.
+    </p>
+  </section>
+
+  <!-- Card -->
+  <section
+    class="rounded-3xl p-6 sm:p-8
+           bg-[var(--surface)]
+           border border-[var(--border)]
+           shadow-sm
+           flex flex-col gap-8">
+
+    <form method="post" class="flex flex-col gap-7">
+      {% csrf_token %}
+
+      <!-- Title -->
+      <div class="flex flex-col gap-1">
+        <label class="text-sm font-medium text-[var(--muted)]">
+          Title <span class="opacity-60">(optional)</span>
+        </label>
+        {{ form.title }}
+      </div>
+
+      <!-- Mood -->
+      <div class="flex flex-col gap-1">
+        <label class="text-sm font-medium text-[var(--muted)]">
+          How are you feeling right now?
+        </label>
+        {{ form.mood }}
+      </div>
+
+      <!-- Content -->
+      <div class="flex flex-col gap-1">
+        <label class="text-sm font-medium text-[var(--muted)]">
+          What’s on your mind?
+        </label>
+        {{ form.content }}
+        <p class="text-xs text-[var(--muted)] mt-1">
+          You don’t have to explain everything — a few words is enough.
+        </p>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex flex-wrap items-center gap-3 pt-5 border-t border-[var(--border)]">
+
+        <!-- Primary -->
+        <button type="submit"
+          class="px-6 py-3 rounded-xl
+                 bg-[var(--primary)] text-white
+                 font-medium">
+          Save reflection
+        </button>
+
+        <!-- Secondary tools -->
+        <div class="flex gap-3">
+
+          <button type="button"
+            class="group flex items-center gap-2 px-5 py-3 rounded-xl
+                   border border-[var(--border)]
+                   hover:border-[var(--primary)] transition">
+
+            <span class="material-symbols-outlined text-[var(--muted)]
+                         group-hover:text-[var(--primary)] transition">
+              psychology
+            </span>
+
+            <span class="text-sm">
+              Explore insights
+            </span>
+          </button>
+
+          <button type="button"
+            class="group flex items-center gap-2 px-5 py-3 rounded-xl
+                   border border-[var(--border)]
+                   hover:border-[var(--primary)] transition">
+
+            <span class="material-symbols-outlined text-[var(--muted)]
+                         group-hover:text-[var(--primary)] transition">
+              headphones
+            </span>
+
+            <span class="text-sm">
+              Listen instead
+            </span>
+          </button>
+
+        </div>
+
+      </div>
+    </form>
+  </section>
+
+  <!-- Gentle reassurance -->
+  <section class="text-sm text-[var(--muted)] max-w-xl">
+    Writing things down doesn’t change everything —
+    but it often changes how heavy things feel.
+  </section>
+
+</div>
+{% endblock %}
