@@ -46,7 +46,7 @@ class Podcast(models.Model):
     title = models.CharField(max_length=200)
     script = models.TextField()
     audio_file = models.FileField(upload_to="podcasts/", blank=True, null=True)
-
+    favorite = models.BooleanField(default=False)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="processing")
 
     created_at = models.DateTimeField(auto_now_add=True)

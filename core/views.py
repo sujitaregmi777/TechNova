@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from threading import Thread
+from django.http import JsonResponse
+from core.utils.filters import apply_common_filters
 
 from core.models import Journal, Podcast
 from core.forms import JournalForm
@@ -83,11 +85,12 @@ def enter_journal(request):
 
 @login_required
 def journal_list(request):
-    journals = Journal.objects.filter(owner=request.user).order_by("-created_at")
-    return render(request, "core/journal_list.html", {"journals": journals})
+    journals = Journal.objects.filter(owner=request.user)
+    journals = apply_common_filters(journals, request)
+    return render(request, "core/journal_list.html", {
+        "journals": journals
+    })
 
-
-@login_required
 @login_required
 def journal_create(request):
     if request.method == "POST":
@@ -178,14 +181,42 @@ def podcast_processing(request, pk):
 
     return render(request, "core/podcast_processing.html", {"podcast": podcast})
 
-
-@login_required
-def podcast_list(request):
-    podcasts = Podcast.objects.filter(owner=request.user).order_by("-created_at")
-    return render(request, "core/podcast_list.html", {"podcasts": podcasts})
-
-
 @login_required
 def listen_podcast(request, pk):
     podcast = get_object_or_404(Podcast, pk=pk, owner=request.user)
     return render(request, "core/listen.html", {"podcast": podcast})
+
+@login_required
+def toggle_favorite(request, id):
+    podcast = get_object_or_404(Podcast, id=id, owner=request.user)
+    podcast.favorite = not podcast.favorite
+    podcast.save()
+    return JsonResponse({"favorite": podcast.favorite})
+
+
+@login_required
+def delete_podcast(request, id):
+    Podcast.objects.filter(id=id, owner=request.user).delete()
+    return JsonResponse({"deleted": True})
+
+@login_required
+def podcast_list(request):
+    podcasts = Podcast.objects.filter(
+        owner=request.user,
+        status="ready"
+    )
+    podcasts = apply_common_filters(podcasts, request)
+
+    return render(request, "core/podcast_list.html", {
+        "podcasts": podcasts
+    })
+
+@login_required
+def chat_list(request):
+    chats = Chat.objects.filter(owner=request.user)
+    chats = apply_common_filters(chats, request)
+
+    return render(request, "core/chat_list.html", {
+        "chats": chats
+    })
+
