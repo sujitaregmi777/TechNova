@@ -7,7 +7,6 @@ from core.utils.filters import apply_common_filters
 
 from core.models import ChatMessage, ChatPodcast, ChatSession, Journal, Podcast
 from core.forms import JournalForm
-# Ensure the streak module is correctly imported
 from core.utils.streak import update_streak  # Import the update_streak function
 from moodmate.reflectcast.audio.generate_audio import text_to_podcast
 from moodmate.reflectcast.audio.mix_audio import mix_voice_with_ambient
@@ -513,6 +512,13 @@ def chat_list(request):
     chats = ChatSession.objects.filter(owner=request.user)
     chats = apply_common_filters(chats, request)
     return render(request, "core/chat_list.html", {"chats": chats})
+
+def podcast_list(request):
+    cleanup_stuck_chat_podcasts()   
+
+    podcasts = Podcast.objects.filter(owner=request.user, status="ready")
+    podcasts = apply_common_filters(podcasts, request)
+    return render(request, "core/podcast_list.html", {"podcasts": podcasts})
 
 @login_required
 def chat_podcast_status(request, pk):
