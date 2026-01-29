@@ -3,6 +3,9 @@ import os
 from pydub import AudioSegment
 from django.conf import settings
 
+AudioSegment.converter = r"C:\ffmpeg\bin\ffmpeg.exe"
+AudioSegment.ffprobe = r"C:\ffmpeg\bin\ffprobe.exe"
+
 
 def mix_voice_with_ambient(voice_path, mood, podcast_id):
     print(f"Mixing ambient sound for mood: {mood}")

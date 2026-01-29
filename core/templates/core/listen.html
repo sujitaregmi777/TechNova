@@ -1,26 +1,127 @@
 {% extends "base.html" %}
+{% load static %}
+
 {% block content %}
-<div class="max-w-2xl mx-auto flex flex-col gap-6">
+<div class="max-w-3xl mx-auto mt-12 px-4">
 
-<h1 class="text-2xl font-semibold">{{ podcast.title }}</h1>
+    <!-- Title -->
+    <h1 class="text-3xl font-semibold text-center mb-2">
+        {{ podcast.title }}
+    </h1>
 
-<div class="rounded-3xl p-6 bg-[var(--surface)]
-            border border-[var(--border)] flex flex-col gap-4">
+    <!-- Date / Time -->
+    <div class="text-center text-sm text-gray-500 mb-8">
+        <i class="fa-regular fa-calendar"></i>
+        {{ podcast.created_at|date:"F j, Y • H:i" }}
+    </div>
 
-  <div class="h-3 rounded-full bg-[var(--surface-alt)] overflow-hidden">
-    <div class="h-full w-1/3 bg-[var(--primary)] animate-pulse"></div>
-  </div>
+    <!-- Player Card -->
+    <div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
 
-  {% if podcast.audio_file %}
-    <audio controls class="w-full">
-      <source src="{{ podcast.audio_file.url }}">
-    </audio>
-  {% else %}
-    <p class="text-sm text-[var(--muted)]">
-      Audio will appear once processing completes.
-    </p>
-  {% endif %}
+        <!-- Hidden HTML Audio -->
+        <audio id="audioPlayer">
+            <source src="{{ podcast.audio_file.url }}" type="audio/mpeg">
+        </audio>
+
+        <!-- Player UI -->
+        <div class="flex items-center gap-4">
+
+            <!-- Play / Pause -->
+            <button id="playBtn"
+                class="w-12 h-12 rounded-full bg-green-500 text-white flex items-center justify-center">
+                <i id="playIcon" class="fa-solid fa-play"></i>
+            </button>
+
+            <!-- Title + Time -->
+            <div class="flex-1">
+                <div class="font-medium">{{ podcast.title }}</div>
+                <div class="text-xs text-gray-500">
+                    <span id="currentTime">0:00</span>
+                    /
+                    <span id="duration">0:00</span>
+                </div>
+            </div>
+
+            <!-- Volume -->
+            <button onclick="toggleMute()" class="text-gray-600">
+                <i id="volumeIcon" class="fa-solid fa-volume-high"></i>
+            </button>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="mt-4">
+            <input id="progressBar"
+                   type="range"
+                   value="0"
+                   min="0"
+                   step="0.1"
+                   class="w-full accent-green-500">
+        </div>
+
+    </div>
+
+    <!-- Back Button -->
+    <div class="text-center mt-8">
+        <a href="{% url 'dashboard' %}"
+           class="px-6 py-2 bg-gray-300 rounded-full text-sm">
+            Back to dashboard
+        </a>
+    </div>
+
 </div>
 
-</div>
+
+<!-- Player Script -->
+<script>
+const audio = document.getElementById("audioPlayer");
+const playBtn = document.getElementById("playBtn");
+const playIcon = document.getElementById("playIcon");
+const progressBar = document.getElementById("progressBar");
+const currentTimeEl = document.getElementById("currentTime");
+const durationEl = document.getElementById("duration");
+const volumeIcon = document.getElementById("volumeIcon");
+
+function formatTime(sec){
+    const minutes = Math.floor(sec / 60);
+    const seconds = Math.floor(sec % 60).toString().padStart(2,'0');
+    return `${minutes}:${seconds}`;
+}
+
+// When metadata loads
+audio.addEventListener("loadedmetadata", () => {
+    durationEl.textContent = formatTime(audio.duration);
+    progressBar.max = audio.duration;
+});
+
+// Play / Pause
+playBtn.addEventListener("click", () => {
+    if(audio.paused){
+        audio.play();
+        playIcon.classList.replace("fa-play","fa-pause");
+    } else {
+        audio.pause();
+        playIcon.classList.replace("fa-pause","fa-play");
+    }
+});
+
+// Update progress bar
+audio.addEventListener("timeupdate", () => {
+    progressBar.value = audio.currentTime;
+    currentTimeEl.textContent = formatTime(audio.currentTime);
+});
+
+// Seek
+progressBar.addEventListener("input", () => {
+    audio.currentTime = progressBar.value;
+});
+
+// Mute
+function toggleMute(){
+    audio.muted = !audio.muted;
+    volumeIcon.className = audio.muted
+        ? "fa-solid fa-volume-xmark"
+        : "fa-solid fa-volume-high";
+}
+</script>
+
 {% endblock %}
