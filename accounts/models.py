@@ -22,3 +22,16 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return f"{self.user.username} | guest={self.is_guest}"
+
+
+
+class UserSettings(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="settings")
+    
+    # Example settings
+    email_notifications = models.BooleanField(default=True)
+    journals_private = models.BooleanField(default=False)
+    dark_mode = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.user.username}'s Settings"
