@@ -1,4 +1,4 @@
-from django import views
+from . import views 
 from django.urls import path
 from django.conf.urls.static import static
 from django.conf import settings
@@ -7,9 +7,11 @@ from core.views import (
     ai_chat,
     chat_delete,
     chat_list,
+    chat_podcast_status,
     chat_processing,
     delete_podcast,
     enter_journal,
+    generate_chat_insight,
     journal_list,
     journal_create,
     journal_edit,
@@ -47,7 +49,18 @@ urlpatterns = [
     path("ai-chat/<int:session_id>/", ai_chat, name="ai_chat"),
     path("ai-chat/save/<int:session_id>/", save_chat, name="save_chat"),
     path("ai-chat/processing/<int:pk>/", chat_processing, name="chat_processing"),
-    path("ai-chat/listen/<int:pk>/", listen_chat, name="listen_chat")
+    path("ai-chat/listen/<int:pk>/", listen_chat, name="listen_chat"),
+    path("podcast/generate/<int:chat_id>/", views.generate_podcast, name="generate_podcast"),
+    path("podcast/processing/<int:podcast_id>/", views.podcast_processing, name="podcast_processing"),
+    path("podcast/status/<int:podcast_id>/", views.podcast_status, name="podcast_status"),
+    path("podcast/listen/<int:podcast_id>/", views.podcast_listen, name="podcast_listen"),
+
+    path("ai-chat/<int:session_id>/generate-insight/",
+     generate_chat_insight,
+     name="generate_chat_insight"),
+     path("ai-chat/status/<int:pk>/",
+     chat_podcast_status,
+     name="chat_podcast_status"),
 
 
 ]

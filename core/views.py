@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from threading import Thread
 from django.http import JsonResponse
+from requests import request
 from core.utils.filters import apply_common_filters
 
 from core.models import ChatMessage, ChatPodcast, ChatSession, Journal, Podcast
@@ -12,6 +13,8 @@ from moodmate.reflectcast.audio.mix_audio import mix_voice_with_ambient
 from moodmate.reflectcast.input.handlers import process_input
 from moodmate.reflectcast.nlp.generate_script import create_script
 from moodmate.reflectcast.nlp.generate_title import generate_podcast_title
+from django.utils import timezone
+from datetime import timedelta
 
 
 # ---------------------------------------------------
@@ -298,6 +301,33 @@ def ai_chat(request, session_id):
         "messages": messages,
         "session": session
     })
+@login_required
+def generate_chat_insight(request, session_id):
+    session = get_object_or_404(ChatSession, id=session_id, owner=request.user)
+
+    # Collect full conversation
+    conversation = "\n".join(
+        f"{m.sender.upper()}: {m.text}"
+        for m in session.messages.order_by("created_at")
+    )
+
+    # Create ChatPodcast record
+    chat_podcast = ChatPodcast.objects.create(
+        owner=request.user,
+        session=session,
+        title="Generating...",
+        script="",
+        status="processing"
+    )
+
+    # Run background insight pipeline
+    Thread(
+        target=generate_chat_podcast_assets,
+        args=(chat_podcast.id, conversation, str(request.user.id))
+    ).start()
+
+    return redirect("chat_processing", chat_podcast.id)
+
 
 def generate_chat_podcast_assets(chat_podcast_id, conversation_text, user_id):
     chat_podcast = ChatPodcast.objects.get(id=chat_podcast_id)
@@ -365,10 +395,16 @@ def save_chat(request, session_id):
 def chat_processing(request, pk):
     chat_podcast = get_object_or_404(ChatPodcast, pk=pk, owner=request.user)
 
+    # If finished → show listen page
     if chat_podcast.status == "ready":
-        return render(request, "core/podcast_processing.html", {
+        return render(request, "core/listen.html", {
             "podcast": chat_podcast
         })
+
+    # Otherwise → show processing screen
+    return render(request, "core/podcast_processing.html", {
+        "podcast": chat_podcast
+    })
     
 @login_required
 def listen_chat(request, pk):
@@ -384,3 +420,94 @@ def chat_delete(request, pk):
         return redirect("chat_list")
 
     return render(request, "core/chat_delete.html", {"chat": chat})
+@login_required
+def generate_podcast(request, chat_id):
+    chat = get_object_or_404(ChatSession, id=chat_id, owner=request.user)
+
+    podcast = Podcast.objects.create(
+        owner=request.user,
+        chat=chat,
+        status="processing"
+    )
+
+    Thread(
+        target=generate_podcast_task,
+        args=(podcast.id,)
+    ).start()
+
+    return redirect("podcast_processing", podcast.id)
+
+
+def generate_podcast_task(podcast_id):
+    podcast = Podcast.objects.get(id=podcast_id)
+    chat = podcast.chat
+
+    try:
+        messages = ChatMessage.objects.filter(session=chat).order_by("created_at")
+
+        # NOTE: your ChatMessage uses field 'text', not 'content'
+        script = "\n".join([m.text for m in messages])
+
+        voice_path = text_to_podcast(script)
+
+        final_audio_path = mix_voice_with_ambient(
+            voice_path=voice_path,
+            mood="calm",
+            podcast_id=podcast_id
+        )
+
+        podcast.audio_file = final_audio_path
+        podcast.status = "ready"
+        podcast.save()
+
+    except Exception as e:
+        podcast.status = "failed"
+        podcast.save()
+        print("Podcast generation error:", e)
+
+
+# ---------------------------------------------------
+# Proper standalone podcast views
+# ---------------------------------------------------
+
+@login_required
+def podcast_processing(request, podcast_id):
+    podcast = get_object_or_404(Podcast, id=podcast_id, owner=request.user)
+
+    if podcast.status == "ready":
+        return redirect("podcast_listen", podcast.id)
+
+    return render(request, "core/processing.html", {"podcast": podcast})
+
+
+@login_required
+def podcast_status(request, podcast_id):
+    podcast = get_object_or_404(Podcast, id=podcast_id, owner=request.user)
+    return JsonResponse({"status": podcast.status})
+
+
+@login_required
+def podcast_listen(request, podcast_id):
+    podcast = get_object_or_404(Podcast, id=podcast_id, owner=request.user)
+    return render(request, "core/listen.html", {"podcast": podcast})
+
+
+def cleanup_stuck_chat_podcasts():
+    limit = timezone.now() - timedelta(minutes=10)
+    ChatPodcast.objects.filter(
+        status="processing",
+        created_at__lt=limit
+    ).delete()
+
+@login_required
+def chat_list(request):
+    cleanup_stuck_chat_podcasts()   # 👈 add this line
+
+    chats = ChatSession.objects.filter(owner=request.user)
+    chats = apply_common_filters(chats, request)
+    return render(request, "core/chat_list.html", {"chats": chats})
+
+@login_required
+def chat_podcast_status(request, pk):
+    chat_podcast = get_object_or_404(ChatPodcast, pk=pk, owner=request.user)
+    return JsonResponse({"status": chat_podcast.status})
