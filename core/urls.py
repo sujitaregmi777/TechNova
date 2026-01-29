@@ -5,15 +5,22 @@ from django.conf import settings
 from accounts.views import dashboard
 from core.views import (
     ai_chat,
+    chat_delete,
+    chat_list,
+    chat_processing,
     delete_podcast,
     enter_journal,
     journal_list,
     journal_create,
     journal_edit,
     journal_delete,
+    listen_chat,
+    listen_chat,
     listen_podcast,
+    new_ai_chat,
     podcast_list,
     podcast_processing,
+    save_chat,
     toggle_favorite
 )
 
@@ -32,9 +39,15 @@ urlpatterns = [
     path("podcast/processing/<int:pk>/", podcast_processing, name="podcast_processing"),
     path("toggle-favorite/<int:id>/", toggle_favorite, name="toggle_favorite"),
     path("delete-podcast/<int:id>/", delete_podcast, name="delete_podcast"),
+    path("ai-chats/delete/<int:pk>/", chat_delete, name="chat_delete"),
 
-    path("ai-chat/", ai_chat, name="ai_chat"),
+
+    path("ai-chat/", chat_list, name="chat_list"),
     path("ai-chat/new/", new_ai_chat, name="new_ai_chat"),
+    path("ai-chat/<int:session_id>/", ai_chat, name="ai_chat"),
+    path("ai-chat/save/<int:session_id>/", save_chat, name="save_chat"),
+    path("ai-chat/processing/<int:pk>/", chat_processing, name="chat_processing"),
+    path("ai-chat/listen/<int:pk>/", listen_chat, name="listen_chat")
 
 
 ]

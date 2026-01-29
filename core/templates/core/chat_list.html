@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}AI Chats · MoodMate{% endblock %}
+{% block content %}
+
+<div class="max-w-5xl mx-auto mt-10 px-4">
+
+  <!-- PAGE HEADER -->
+  <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+
+    <div>
+      <h1 class="text-4xl font-bold text-[var(--text)]">AI Chats</h1>
+      <p class="text-[var(--muted)] text-lg">Your reflective conversations</p>
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="flex gap-3 items-center">
+
+      <!-- Search -->
+      <form method="get" class="relative">
+        <input name="q" value="{{ request.GET.q }}"
+          placeholder="Search chats..."
+          class="pl-9 pr-3 py-2 rounded-xl border border-[var(--border)] bg-[var(--surface)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]">
+        <span class="absolute left-3 top-2.5 text-[var(--muted)]">🔍</span>
+      </form>
+
+      <!-- Sort -->
+      <a href="?sort={% if request.GET.sort == 'old' %}new{% else %}old{% endif %}"
+         class="px-3 py-2 rounded-xl border border-[var(--border)] text-sm hover:bg-[var(--surface)]">
+        ⇅ Sort
+      </a>
+
+      <!-- New Chat -->
+      <a href="{% url 'new_ai_chat' %}"
+         class="px-4 py-2 rounded-xl bg-[var(--primary)] text-white text-sm font-medium">
+        + New Chat
+      </a>
+
+    </div>
+  </div>
+
+
+  {% if chats %}
+  <div class="space-y-5">
+
+    {% for chat in chats %}
+
+      <!-- CHAT CARD -->
+      <a href="{% url 'ai_chat' chat.id %}"
+         class="bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-5
+                flex items-center justify-between hover:shadow transition">
+
+        <!-- LEFT ICON + INFO -->
+        <div class="flex items-center gap-5">
+
+          <!-- Icon -->
+          <div class="w-14 h-14 rounded-full bg-emerald-100 flex items-center justify-center">
+            💬
+          </div>
+
+          <!-- Text -->
+          <div>
+            <h2 class="font-semibold text-lg text-[var(--text)]">
+              Conversation {{ forloop.counter }}
+            </h2>
+
+            <!-- Journal-style meta info (no long text preview) -->
+            <p class="text-sm text-[var(--muted)] flex items-center gap-2">
+              {{ chat.created_at|date:"M d, Y" }}
+              <span class="opacity-50">•</span>
+
+              {% if chat.completed %}
+                Saved
+              {% else %}
+                In progress
+              {% endif %}
+            </p>
+          </div>
+
+        </div>
+
+      </a>
+
+    {% endfor %}
+
+  </div>
+
+  {% else %}
+    <div class="text-center mt-20">
+      <h2 class="text-xl font-semibold mb-3">No chats yet</h2>
+      <p class="text-[var(--muted)] mb-6">
+        Start a conversation with your AI companion.
+      </p>
+      <a href="{% url 'new_ai_chat' %}"
+         class="px-6 py-3 rounded-xl bg-[var(--primary)] text-white font-medium">
+        Start First Chat
+      </a>
+    </div>
+  {% endif %}
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}AI Companion · MoodMate{% endblock %}
+{% block content %}
+
+<div class="max-w-4xl mx-auto mt-6 px-4 flex flex-col h-[82vh]">
+
+  <!-- Header -->
+  <div class="flex items-center gap-3 mb-4">
+    <a href="{% url 'chat_list' %}" class="text-xl">←</a>
+    <div>
+      <h1 class="text-xl font-semibold">AI Companion</h1>
+      <p class="text-sm text-[var(--muted)]">Here to listen and reflect</p>
+    </div>
+  </div>
+
+  {% include "ai_chat/chat_list.html" %}
+  {% include "ai_chat/chat_input.html" %}
+
+</div>
+{% endblock %}

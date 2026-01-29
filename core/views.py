@@ -4,7 +4,7 @@ from threading import Thread
 from django.http import JsonResponse
 from core.utils.filters import apply_common_filters
 
-from core.models import Journal, Podcast
+from core.models import ChatMessage, ChatPodcast, ChatSession, Journal, Podcast
 from core.forms import JournalForm
 
 from moodmate.reflectcast.audio.generate_audio import text_to_podcast
@@ -213,34 +213,174 @@ def podcast_list(request):
 
 @login_required
 def chat_list(request):
-    chats = Chat.objects.filter(owner=request.user)
+    chats = ChatSession.objects.filter(owner=request.user)
     chats = apply_common_filters(chats, request)
 
     return render(request, "core/chat_list.html", {
         "chats": chats
     })
 
-def ai_chat(request):
-    messages = ChatMessage.objects.filter(user=request.user).order_by("created_at")
+def generate_ai_reply_from_chat(session, user_text, user_id):
+    """
+    Uses existing LLM script generator to produce next AI question
+    """
+
+    # Build conversation so far
+    conversation = "\n".join(
+        f"{m.sender.upper()}: {m.text}"
+        for m in session.messages.order_by("created_at")
+    )
+
+    # Prompt instructing LLM to ask next deep question
+    prompt = f"""
+You are an empathetic AI companion helping a user reflect.
+Your goal is to ask ONE thoughtful follow-up question that helps understand the user deeper.
+Do NOT give advice yet. Only ask one question.
+
+Conversation so far:
+{conversation}
+
+User just said:
+{user_text}
+
+Ask the next question:
+"""
+
+    ai_question = create_script(
+        reflection=prompt,
+        emotion="reflective",
+        user_id=user_id
+    )
+
+    return ai_question.strip()
+
+@login_required
+def new_ai_chat(request):
+    session = ChatSession.objects.create(owner=request.user)
+
+    ChatMessage.objects.create(
+        session=session,
+        sender="ai",
+        text="Hello! I'm here to listen and help you reflect. How are you feeling today?"
+    )
+
+    return redirect("ai_chat", session_id=session.id)
+
+@login_required
+def ai_chat(request, session_id):
+    session = get_object_or_404(ChatSession, id=session_id, owner=request.user)
+    messages = session.messages.order_by("created_at")
 
     if request.method == "POST":
         user_text = request.POST["message"]
 
         ChatMessage.objects.create(
-            user=request.user,
+            session=session,
             sender="user",
             text=user_text
         )
 
-        # --- AI response (later connect to Ollama) ---
-        ai_reply = generate_ai_reply(user_text)
+        ai_reply = generate_ai_reply_from_chat(
+            session=session,
+            user_text=user_text,
+            user_id=str(request.user.id)
+        )
 
         ChatMessage.objects.create(
-            user=request.user,
+            session=session,
             sender="ai",
             text=ai_reply
         )
 
-        return redirect("ai_chat")
+        return redirect("ai_chat", session_id=session.id)
 
-    return render(request, "ai_chat.html", {"messages": messages})
+    return render(request, "core/chat_input.html", {
+        "messages": messages,
+        "session": session
+    })
+
+def generate_chat_podcast_assets(chat_podcast_id, conversation_text, user_id):
+    chat_podcast = ChatPodcast.objects.get(id=chat_podcast_id)
+
+    print("Generating chat-based title...")
+    title = generate_podcast_title(
+        reflection=conversation_text,
+        emotion="reflective"
+    )
+
+    print("Generating chat-based script...")
+    script = create_script(
+        reflection=conversation_text,
+        emotion="reflective",
+        user_id=user_id
+    )
+
+    audio_path = text_to_podcast(script)
+
+    final_audio_path = mix_voice_with_ambient(
+        voice_path=audio_path,
+        mood="calm",
+        podcast_id=chat_podcast_id
+    )
+
+    chat_podcast.title = title
+    chat_podcast.script = script
+    chat_podcast.audio_file = final_audio_path
+    chat_podcast.status = "ready"
+    chat_podcast.save()
+
+@login_required
+def save_chat(request, session_id):
+    session = get_object_or_404(ChatSession, id=session_id, owner=request.user)
+    session.completed = True
+    session.save()
+
+    # Collect full conversation text
+    conversation = "\n".join(
+        f"{m.sender.upper()}: {m.text}"
+        for m in session.messages.order_by("created_at")
+    )
+
+    # Create ChatPodcast record
+    chat_podcast = ChatPodcast.objects.create(
+        owner=request.user,
+        session=session,
+        title="Generating...",
+        script="",
+        status="processing"
+    )
+
+    # Start background worker using your existing pipeline
+    Thread(
+        target=generate_chat_podcast_assets,
+        args=(chat_podcast.id, conversation, str(request.user.id))
+    ).start()
+
+    # Reuse SAME processing screen as journals
+    return redirect("chat_processing", chat_podcast.id)
+
+
+
+@login_required
+def chat_processing(request, pk):
+    chat_podcast = get_object_or_404(ChatPodcast, pk=pk, owner=request.user)
+
+    if chat_podcast.status == "ready":
+        return render(request, "core/podcast_processing.html", {
+            "podcast": chat_podcast
+        })
+    
+@login_required
+def listen_chat(request, pk):
+    chat_podcast = get_object_or_404(ChatPodcast, pk=pk, owner=request.user)
+    return render(request, "core/listen.html", {"podcast": chat_podcast})
+
+@login_required
+def chat_delete(request, pk):
+    chat = get_object_or_404(ChatSession, pk=pk, owner=request.user)
+
+    if request.method == "POST":
+        chat.delete()
+        return redirect("chat_list")
+
+    return render(request, "core/chat_delete.html", {"chat": chat})
