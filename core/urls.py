@@ -1,8 +1,11 @@
+from django import views
 from django.urls import path
 from django.conf.urls.static import static
 from django.conf import settings
 from accounts.views import dashboard
 from core.views import (
+    # ai_chat,
+    delete_podcast,
     enter_journal,
     journal_list,
     journal_create,
@@ -10,7 +13,8 @@ from core.views import (
     journal_delete,
     listen_podcast,
     podcast_list,
-    podcast_processing
+    podcast_processing,
+    toggle_favorite
 )
 
 urlpatterns = [
@@ -26,6 +30,13 @@ urlpatterns = [
     path("podcasts/<int:pk>/", listen_podcast, name="listen_podcast"),
 
     path("podcast/processing/<int:pk>/", podcast_processing, name="podcast_processing"),
+    path("toggle-favorite/<int:id>/", toggle_favorite, name="toggle_favorite"),
+    path("delete-podcast/<int:id>/", delete_podcast, name="delete_podcast"),
+
+    # path("ai-chat/", ai_chat, name="ai_chat"),
+    # path("ai-chat/new/", new_ai_chat, name="new_ai_chat"),
+
+
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

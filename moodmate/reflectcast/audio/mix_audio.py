@@ -7,13 +7,13 @@ from django.conf import settings
 def mix_voice_with_ambient(voice_path, mood, podcast_id):
     print(f"Mixing ambient sound for mood: {mood}")
     mood = mood.lower()
-    PROJECT_ROOT = os.path.dirname(settings.BASE_DIR)
+    PROJECT_ROOT = settings.BASE_DIR
     ambient_map = {
-        "peaceful": os.path.join(PROJECT_ROOT, "assets/ambient/peaceful.mp3"),
+        "overwhelmed": os.path.join(PROJECT_ROOT, "assets/ambient/overwhelmed.mp3"),
         "sad": os.path.join(PROJECT_ROOT, "assets/ambient/sad.mp3"),
         "anxious": os.path.join(PROJECT_ROOT, "assets/ambient/anxious.mp3"),
-        "tired": os.path.join(PROJECT_ROOT, "assets/ambient/tired.mp3"),
-        "thoughtful": os.path.join(PROJECT_ROOT, "assets/ambient/thoughtful.mp3"),
+        "calm": os.path.join(PROJECT_ROOT, "assets/ambient/calm.mp3"),
+        "happy": os.path.join(PROJECT_ROOT, "assets/ambient/happy.mp3"),
         "default": os.path.join(PROJECT_ROOT, "assets/ambient/default.mp3"),
     }
 

@@ -29,33 +29,95 @@
     </h2>
 
     <!-- Emoji buttons -->
-    <div class="flex justify-between items-center px-2">
+<div class="grid grid-cols-3 sm:grid-cols-6 gap-4 px-2">
 
-      <button type="button" onclick="setMood('sad')"
-        class="group flex flex-col items-center gap-2 cursor-pointer">
-        <span class="text-3xl group-hover:scale-110 transition">😔</span>
-        <span class="text-[10px] font-bold text-[var(--muted)] uppercase">Sad</span>
-      </button>
+  <!-- Happy -->
+  <button type="button" onclick="setMood('happy')"
+    class="group flex flex-col items-center gap-2 p-3 rounded-2xl
+           border border-[var(--border)]
+           hover:border-[var(--primary)]
+           hover:bg-[var(--surface-alt)]
+           transition">
+    <span class="material-symbols-outlined text-3xl text-[var(--primary)]
+                 group-hover:scale-110 transition">
+      sentiment_satisfied
+    </span>
+    <span class="text-xs font-medium text-[var(--primary)]">Happy</span>
+  </button>
 
-      <button type="button" onclick="setMood('anxious')"
-        class="group flex flex-col items-center gap-2 cursor-pointer">
-        <span class="text-3xl group-hover:scale-110 transition">😐</span>
-        <span class="text-[10px] font-bold text-[var(--muted)] uppercase">Anxious</span>
-      </button>
+  <!-- Sad -->
+  <button type="button" onclick="setMood('sad')"
+    class="group flex flex-col items-center gap-2 p-3 rounded-2xl
+           border border-[var(--border)]
+           hover:border-[var(--primary)]
+           hover:bg-[var(--surface-alt)]
+           transition">
+    <span class="material-symbols-outlined text-3xl text-[var(--muted)]
+                 group-hover:text-[var(--primary)] transition">
+      sentiment_dissatisfied
+    </span>
+    <span class="text-xs font-medium text-[var(--muted)]">Sad</span>
+  </button>
 
-      <button type="button" onclick="setMood('happy')"
-        class="group flex flex-col items-center gap-2 cursor-pointer">
-        <span class="text-3xl group-hover:scale-110 transition">😊</span>
-        <span class="text-[10px] font-bold text-[var(--primary)] uppercase">Happy</span>
-      </button>
+  <!-- Anxious -->
+  <button type="button" onclick="setMood('anxious')"
+    class="group flex flex-col items-center gap-2 p-3 rounded-2xl
+           border border-[var(--border)]
+           hover:border-[var(--primary)]
+           hover:bg-[var(--surface-alt)]
+           transition">
+    <span class="material-symbols-outlined text-3xl text-[var(--muted)]
+                 group-hover:text-[var(--primary)] transition">
+      sentiment_neutral
+    </span>
+    <span class="text-xs font-medium text-[var(--muted)]">Anxious</span>
+  </button>
 
-      <button type="button" onclick="setMood('grateful')"
-        class="group flex flex-col items-center gap-2 cursor-pointer">
-        <span class="text-3xl group-hover:scale-110 transition">🤩</span>
-        <span class="text-[10px] font-bold text-[var(--muted)] uppercase">Grateful</span>
-      </button>
+  <!-- Calm -->
+  <button type="button" onclick="setMood('calm')"
+    class="group flex flex-col items-center gap-2 p-3 rounded-2xl
+           border border-[var(--border)]
+           hover:border-[var(--primary)]
+           hover:bg-[var(--surface-alt)]
+           transition">
+    <span class="material-symbols-outlined text-3xl text-[var(--muted)]
+                 group-hover:text-[var(--primary)] transition">
+      water_drop
+    </span>
+    <span class="text-xs font-medium text-[var(--muted)]">Calm</span>
+  </button>
 
-    </div>
+  <!-- Grateful -->
+  <button type="button" onclick="setMood('grateful')"
+    class="group flex flex-col items-center gap-2 p-3 rounded-2xl
+           border border-[var(--border)]
+           hover:border-[var(--primary)]
+           hover:bg-[var(--surface-alt)]
+           transition">
+    <span class="material-symbols-outlined text-3xl text-[var(--muted)]
+                 group-hover:text-[var(--primary)] transition">
+      volunteer_activism
+    </span>
+    <span class="text-xs font-medium text-[var(--muted)]">Grateful</span>
+  </button>
+
+  <!-- Overwhelmed -->
+  <button type="button" onclick="setMood('overwhelmed')"
+    class="group flex flex-col items-center gap-2 p-3 rounded-2xl
+           border border-[var(--border)]
+           hover:border-[var(--primary)]
+           hover:bg-[var(--surface-alt)]
+           transition">
+    <span class="material-symbols-outlined text-3xl text-[var(--muted)]
+                 group-hover:text-[var(--primary)] transition">
+      waves
+    </span>
+    <span class="text-xs font-medium text-[var(--muted)]">Overwhelmed</span>
+  </button>
+
+</div>
+
+
 
     <!-- Progress bar -->
     <div class="w-full h-3 rounded-full bg-[var(--surface-alt)] overflow-hidden">
@@ -93,7 +155,7 @@
   {% endif %}
 
 </section>
-
+<!-- 
 
     <div class="flex gap-2 mt-2">
       <span class="px-3 py-1 rounded-full text-xs
@@ -104,7 +166,7 @@
                    bg-[var(--primary)]/10 text-[var(--primary)]">
         Building a gentle rhythm
       </span>
-    </div>
+    </div> -->
   </section>
   
   <!-- LATEST PODCAST -->
@@ -165,7 +227,7 @@
   <!-- QUICK ACTIONS -->
   <section class="grid grid-cols-1 sm:grid-cols-2 gap-6">
 
-    <a href=""
+    <a href="{% url 'journal_create' %}"
        class="rounded-3xl p-6 bg-[var(--surface)]
               border border-[var(--border)]
               hover:border-[var(--primary)] transition">
@@ -175,7 +237,7 @@
       </p>
     </a>
 
-    <a href="/chat/"
+    <a href=""
        class="rounded-3xl p-6 bg-[var(--surface)]
               border border-[var(--border)]
               hover:border-[var(--primary)] transition">
@@ -201,7 +263,7 @@
       </p>
     </div>
 
-    <a href=""
+    <a href="{% url 'breathing' %}"
        class="px-6 py-3 rounded-xl bg-white text-black font-medium">
       Start breathing
     </a>
@@ -224,29 +286,9 @@
 <!-- JS -->
 <script>
 function setMood(mood) {
-  const moodMap = {
-    sad: { width: "25%", text: "feeling low" },
-    anxious: { width: "40%", text: "a bit anxious" },
-    happy: { width: "70%", text: "feeling good" },
-    grateful: { width: "85%", text: "feeling grateful" },
-  };
-
-  document.getElementById("moodBar").style.width = moodMap[mood].width;
-  document.getElementById("moodText").innerText =
-    "Current state: " + moodMap[mood].text;
-
-  fetch("{% url 'set_mood' %}", {
-    method: "POST",
-    headers: {
-      "X-CSRFToken": "{{ csrf_token }}",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ mood }),
-  }).then(() => {
-    setTimeout(() => {
-      window.location.href = "";
-    }, 400);
-  });
+  window.location.href =
+    "{% url 'journal_create' %}?mood=" + mood;
 }
 </script>
+
 {% endblock %}

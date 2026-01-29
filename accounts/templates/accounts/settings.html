@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="px-6 ">
+
+    <!-- Page Title -->
+    <h1 class="text-3xl font-bold text-gray-800 mb-8">
+        Account Settings
+    </h1>
+
+    <!-- ================= PROFILE PHOTO ================= -->
+    <div class="bg-white rounded-2xl shadow p-6 mb-10">
+        <h2 class="text-xl font-semibold text-gray-700 mb-4">
+            Profile Photo
+        </h2>
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="flex items-center gap-6">
+                <!-- Avatar Preview -->
+                <div class="w-24 h-24 rounded-full bg-gray-200 overflow-hidden">
+                    <img
+                        src="{% if profile.photo %}{{ profile.photo.url }}{% else %}{% static 'images/default-avatar.png' %}{% endif %}"
+                        alt="Profile Photo"
+                        class="w-full h-full object-cover"
+                    />
+                </div>
+
+                <!-- Upload -->
+                <div class="flex-1">
+                    <label class="block mb-2 text-sm font-medium text-gray-600">
+                        Upload new photo
+                    </label>
+
+                    {{ photo_form.photo }}
+
+                    <p class="text-xs text-gray-400 mt-2">
+                        JPG or PNG, max 2MB
+                    </p>
+                </div>
+            </div>
+
+            <div class="mt-6">
+                <button
+                    type="submit"
+                    name="photo_submit"
+                    class="px-6 py-2 rounded-xl bg-indigo-600 text-white font-medium hover:bg-indigo-700 transition"
+                >
+                    Update Photo
+                </button>
+
+                {% if profile.photo %}
+    <button
+        type="submit"
+        name="delete_photo"
+        class="ml-3 px-6 py-2 rounded-xl bg-red-100 text-red-600 font-medium hover:bg-red-200 transition"
+    >
+        Remove Photo
+    </button>
+{% endif %}
+
+            </div>
+        </form>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow p-6">
+        <h2 class="text-xl font-semibold text-gray-700 mb-4">
+            Change Password
+        </h2>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                <!-- Old Password -->
+                <div>
+                    <label class="block mb-2 text-sm font-medium text-gray-600">
+                        Current Password
+                    </label>
+                    {{ password_form.old_password }}
+                    {% if password_form.old_password.errors %}
+                        <p class="text-sm text-red-500 mt-1">
+                            {{ password_form.old_password.errors.0 }}
+                        </p>
+                    {% endif %}
+                </div>
+
+                <!-- New Password -->
+                <div>
+                    <label class="block mb-2 text-sm font-medium text-gray-600">
+                        New Password
+                    </label>
+                    {{ password_form.new_password1 }}
+                    {% if password_form.new_password1.errors %}
+                        <p class="text-sm text-red-500 mt-1">
+                            {{ password_form.new_password1.errors.0 }}
+                        </p>
+                    {% endif %}
+                </div>
+
+                <!-- Confirm Password -->
+                <div>
+                    <label class="block mb-2 text-sm font-medium text-gray-600">
+                        Confirm New Password
+                    </label>
+                    {{ password_form.new_password2 }}
+                    {% if password_form.new_password2.errors %}
+                        <p class="text-sm text-red-500 mt-1">
+                            {{ password_form.new_password2.errors.0 }}
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="mt-6">
+                <button
+                    type="submit"
+                    name="password_submit"
+                    class="px-6 py-3 rounded-xl bg-indigo-600 text-white font-medium hover:bg-indigo-700 transition"
+                >
+                    Change Password
+                </button>
+            </div>
+        </form>
+    </div>
+
+</div>
+{% endblock %}

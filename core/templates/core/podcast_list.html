@@ -1,81 +1,134 @@
 {% extends "base.html" %}
-{% block title %}Your Insights · MoodMate{% endblock %}
-
+{% block title %}Podcasts · MoodMate{% endblock %}
 {% block content %}
-<div class="max-w-4xl mx-auto mt-12">
 
-  <!-- Page Header -->
-  <div class="flex justify-between items-center mb-8">
-    <h1 class="text-3xl font-bold">Your Insight Podcasts</h1>
+<div class="max-w-5xl mx-auto mt-10 px-4">
 
-    <a href="{% url 'journal_create' %}"
-       class="px-5 py-2 rounded-xl bg-[var(--primary)] text-white text-sm font-medium">
-      + New Reflection
-    </a>
+  <!-- PAGE HEADER -->
+  <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+
+    <div>
+      <h1 class="text-4xl font-bold text-[var(--text)]">Podcasts</h1>
+      <p class="text-[var(--muted)] text-lg">Your audio reflections</p>
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="flex gap-3 items-center">
+
+      <!-- Search -->
+      <form method="get" class="relative">
+        <input name="q" value="{{ request.GET.q }}"
+          placeholder="Search podcast..."
+          class="pl-9 pr-3 py-2 rounded-xl border border-[var(--border)] bg-[var(--surface)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]">
+        <span class="absolute left-3 top-2.5 text-[var(--muted)]">🔍</span>
+      </form>
+
+      <!-- Favorites Filter -->
+      <a href="?favorites=1"
+         class="px-3 py-2 rounded-xl border border-[var(--border)] text-sm hover:bg-[var(--surface)]">
+        ❤️ Favorites
+      </a>
+
+      <!-- Sort -->
+      <a href="?sort={% if request.GET.sort == 'old' %}new{% else %}old{% endif %}"
+         class="px-3 py-2 rounded-xl border border-[var(--border)] text-sm hover:bg-[var(--surface)]">
+        ⇅ Sort
+      </a>
+
+      <!-- New Reflection -->
+      <a href="{% url 'journal_create' %}"
+         class="px-4 py-2 rounded-xl bg-[var(--primary)] text-white text-sm font-medium">
+        + New Reflection
+      </a>
+
+    </div>
   </div>
 
+
   {% if podcasts %}
-    <div class="grid gap-4">
+  <div class="space-y-5">
 
-      {% for podcast in podcasts %}
+    {% for podcast in podcasts %}
 
-        <!-- Ready Podcast (Clickable) -->
-        {% if podcast.status == "ready" %}
-          <a href="{% url 'listen_podcast' podcast.id %}"
-             class="block p-5 rounded-2xl border border-[var(--border)]
-                    bg-[var(--surface)]
-                    hover:border-[var(--primary)]
-                    hover:shadow-md transition">
+      <!-- READY -->
+      {% if podcast.status == "ready" %}
+      <div class="bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-5 flex items-center justify-between hover:shadow transition">
 
-            <div class="flex items-center justify-between">
-              <div>
-                <h2 class="font-semibold text-lg">
-                  🎧 {{ podcast.title }}
-                </h2>
-                <p class="text-sm text-[var(--muted)]">
-                  Tap to listen to your insights
-                </p>
-              </div>
+        <!-- LEFT PLAY + INFO -->
+        <a href="{% url 'listen_podcast' podcast.id %}" class="flex items-center gap-5 flex-1">
 
-              <span class="text-green-500 text-sm font-medium">
-                Ready
-              </span>
-            </div>
-          </a>
-        {% else %}
+          <!-- Play circle -->
+          <div class="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center">
+            <svg width="26" height="26" fill="none" stroke="#0A9B63" stroke-width="2">
+              <polygon points="5,3 19,12 5,21"></polygon>
+            </svg>
+          </div>
 
-        <!-- Processing Podcast (Not clickable) -->
-          <div class="p-5 rounded-2xl border border-[var(--border)]
-                      bg-[var(--surface)]
-                      opacity-60 cursor-not-allowed">
+          <!-- Text -->
+          <div>
+            <h2 class="font-semibold text-lg">{{ podcast.title }}</h2>
+            <p class="text-sm text-[var(--muted)] flex items-center gap-2">
+              📅 {{ podcast.created_at|date:"M d, Y" }}
+            </p>
+          </div>
 
-            <div class="flex items-center justify-between">
-              <div>
-                <h2 class="font-semibold text-lg">
-                  Preparing your insights...
-                </h2>
-                <p class="text-sm text-[var(--muted)]">
-                  This will be ready soon
-                </p>
-              </div>
+        </a>
 
-              <span class="text-yellow-500 text-sm font-medium">
-                Processing
-              </span>
+        <!-- RIGHT ACTIONS -->
+        <div class="flex items-center gap-4">
+
+          <!-- Favorite -->
+          <button onclick="toggleFavorite('{{ podcast.id }}', this)">
+            {% if podcast.favorite %}
+              <span class="text-red-500 text-xl">❤️</span>
+            {% else %}
+              <span class="text-gray-400 text-xl">🤍</span>
+            {% endif %}
+          </button>
+
+          <!-- 3-dot menu -->
+          <div class="relative">
+            <button onclick="toggleMenu('{{ podcast.id }}')" class="text-xl text-gray-400">⋮</button>
+
+            <div id="menu-{{ podcast.id }}"
+                 class="hidden absolute right-0 mt-2 w-28 bg-white border border-[var(--border)] rounded-xl shadow text-sm z-10">
+              <button onclick="deletePodcast('{{ podcast.id }}')"
+                class="block w-full text-left px-4 py-2 hover:bg-red-50 text-red-500">
+                Delete
+              </button>
             </div>
           </div>
 
-        {% endif %}
+        </div>
+      </div>
+      {% else %}
 
-      {% endfor %}
-    </div>
+      <!-- PROCESSING -->
+      <div class="bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-5 flex items-center justify-between opacity-60">
+
+        <div class="flex items-center gap-5">
+          <div class="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center">
+            ⏳
+          </div>
+          <div>
+            <h2 class="font-semibold text-lg">Preparing your reflection…</h2>
+            <p class="text-sm text-[var(--muted)]">Will be ready soon</p>
+          </div>
+        </div>
+
+        <span class="text-yellow-500 text-sm font-medium">Processing</span>
+      </div>
+
+      {% endif %}
+    {% endfor %}
+
+  </div>
 
   {% else %}
-    <!-- Empty State -->
     <div class="text-center mt-20">
-      <h2 class="text-xl font-semibold mb-3">No insights yet</h2>
+      <h2 class="text-xl font-semibold mb-3">No reflections yet</h2>
       <p class="text-[var(--muted)] mb-6">
-        Write a reflection to generate your first insight podcast.
+        Write a reflection to generate your first podcast.
       </p>
       <a href="{% url 'journal_create' %}"
          class="px-6 py-3 rounded-xl bg-[var(--primary)] text-white font-medium">
@@ -85,4 +138,31 @@
   {% endif %}
 
 </div>
+
+
+<!-- JS ACTIONS -->
+<script>
+function toggleMenu(id){
+  document.getElementById("menu-"+id).classList.toggle("hidden")
+}
+
+function toggleFavorite(id, btn){
+  fetch(`/toggle-favorite/${id}/`)
+    .then(res => res.json())
+    .then(data => {
+      btn.innerHTML = data.favorite ? "❤️" : "🤍"
+    })
+}
+
+function deletePodcast(id){
+  fetch(`/delete-podcast/${id}/`)
+    .then(res => res.json())
+    .then(data => {
+      if(data.deleted){
+        location.reload()
+      }
+    })
+}
+</script>
+
 {% endblock %}

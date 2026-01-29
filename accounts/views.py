@@ -5,20 +5,17 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.conf import settings
 from django.core.mail import send_mail
-
 from core.models import Journal, Podcast
 from .models import EmailOTP
-import random
-import uuid
-import json
+import uuid,json,os,random
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .models import Reflection
-from .forms import ReflectionForm, CommentForm
+from .forms import ReflectionForm, CommentForm,ProfilePhotoForm, StyledPasswordChangeForm
 from .utils import check_content,update_streak
 from .models import Article, Comment
-
-
+from django.contrib.auth import update_session_auth_hash
+from .models import UserProfile
 
 
 def index(request):
@@ -247,6 +244,9 @@ def set_mood(request):
 def breathing(request):
     return render(request, "accounts/breathing.html")
 
+def settings(request):
+    return render(request, "accounts/settings.html")
+
 def reflections_list(request):
     reflections = Reflection.objects.order_by("-created_at")
     return render(request, "accounts/blog/reflections_list.html", {
@@ -311,33 +311,39 @@ def edit_reflection(request, pk):
 
 @login_required
 def add_comment(request, pk):
-
     reflection = get_object_or_404(Reflection, pk=pk)
 
     if request.method == "POST":
         form = CommentForm(request.POST)
         if form.is_valid():
             content = form.cleaned_data["content"]
-            print("🔥 COMMENT FORM SUBMITTED")
 
             check = check_content(content)
-            print("✅ BEFORE CHECK")
-
-
 
             if check == "hard":
-                messages.error(request, "This comment contains harmful language.")
+                messages.error(
+                    request,
+                    "This comment wasn’t posted because it may be harmful."
+                )
                 return redirect("reflection_detail", pk=pk)
-
-            if check == "soft":
-                messages.warning(request, "Please keep responses supportive.")
 
             comment = form.save(commit=False)
             comment.author = request.user
             comment.reflection = reflection
+
+            if check == "soft":
+                comment.is_approved = True
+                messages.warning(
+                    request,
+                    "Please try to keep responses kind and supportive."
+                )
+            else:
+                comment.is_approved = True
+
             comment.save()
 
     return redirect("reflection_detail", pk=pk)
+
 
 def explore(request):
     articles = Article.objects.order_by("-created_at")
@@ -401,5 +407,73 @@ def delete_reflection(request, pk):
 
     # Safety fallback
     return redirect("reflection_detail", pk=pk)
+
+@login_required
+def settings(request):
+    profile, created = UserProfile.objects.get_or_create(user=request.user)
+
+    # Forms
+    photo_form = ProfilePhotoForm(instance=profile)
+    password_form = StyledPasswordChangeForm(user=request.user)
+
+    if request.method == "POST":
+
+        # PHOTO UPDATE
+        if "photo_submit" in request.POST:
+            photo_form = ProfilePhotoForm(
+                request.POST,
+                request.FILES,
+                instance=profile
+            )
+            if photo_form.is_valid():
+                photo_form.save()
+                messages.success(request, "Profile photo updated successfully.")
+                return redirect("settings")
+
+        # PASSWORD CHANGE
+        elif "password_submit" in request.POST:
+            password_form = StyledPasswordChangeForm(
+                user=request.user,
+                data=request.POST
+            )
+            if password_form.is_valid():
+                user = password_form.save()
+                update_session_auth_hash(request, user)
+                messages.success(request, "Password changed successfully.")
+                return redirect("settings")
+            
+        # DELETE PHOTO
+        elif "delete_photo" in request.POST:
+            if profile.photo:
+        # delete file from storage
+                if os.path.isfile(profile.photo.path):
+                    os.remove(profile.photo.path)
+
+        profile.photo = None
+        profile.save()
+
+        messages.success(request, "Profile photo removed.")
+        return redirect("settings")
+
+
+    context = {
+        "photo_form": photo_form,
+        "password_form": password_form,
+        "profile": profile,
+    }
+    return render(request, "accounts/settings.html", context)
+
+@login_required
+def toggle_reflection_favorite(request, pk):
+    reflection = get_object_or_404(Reflection, pk=pk)
+
+    if request.user in reflection.favorites.all():
+        reflection.favorites.remove(request.user)
+    else:
+        reflection.favorites.add(request.user)
+
+    return redirect("reflections_list")
+
+
 
 

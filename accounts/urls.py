@@ -47,6 +47,7 @@ urlpatterns = [
 
     path("set-mood/", views.set_mood, name="set_mood"),
     path("breathing/", views.breathing, name="breathing"),
+    path("settings/", views.settings, name="settings"),
     path("reflections/", views.reflections_list, name="reflections_list"),
     path("reflections/new/", views.create_reflection, name="create_reflection"),
     path("reflections/<int:pk>/", views.reflection_detail, name="reflection_detail"),
@@ -56,6 +57,12 @@ urlpatterns = [
     path("read/<int:pk>/", views.article_detail, name="article_detail"),
     path("blogs/", views.blogs, name="blogs"),
     path("reflections/<int:pk>/delete/",views.delete_reflection,name="delete_reflection"),
+    path(
+  "reflections/<int:pk>/favorite/",
+  views.toggle_reflection_favorite,
+  name="toggle_reflection_favorite"
+),
+
 
     
 

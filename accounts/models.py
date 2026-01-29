@@ -18,10 +18,12 @@ class EmailOTP(models.Model):
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    photo = models.ImageField(upload_to="profile_photos/", blank=True, null=True)
+    is_guest = models.BooleanField(default=False)
     action_count = models.PositiveIntegerField(default=0)
 
     def __str__(self):
-        return f"{self.user.username} "
+        return f"{self.user.username}  "
     
 
 class Article(models.Model):
@@ -59,6 +61,11 @@ class Reflection(models.Model):
 
     title = models.CharField(max_length=200)
     text = models.TextField()
+    favorites = models.ManyToManyField(
+        settings.AUTH_USER_MODEL,
+        related_name="favorite_reflections",
+        blank=True
+    )
 
     image = models.ImageField(
         upload_to="reflections/",
