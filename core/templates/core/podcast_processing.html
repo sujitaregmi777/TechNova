@@ -39,6 +39,21 @@
   setTimeout(function() {
     window.location.reload();
   }, 5000);
+  
+const podcastId = "{{ podcast.id }}";
+
+setInterval(async () => {
+  const res = await fetch(`/ai-chat/status/${podcastId}/`);
+  const data = await res.json();
+
+  if (data.status === "ready") {
+     document.getElementById("status-text").innerText =
+       "🎉 Your audio insight is ready!";
+     
+     document.getElementById("listen-btn").classList.remove("hidden");
+  }
+}, 4000);
 </script>
+
 
 {% endblock %}
