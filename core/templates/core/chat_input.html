@@ -1,67 +1,104 @@
 {% extends "base.html" %}
-{% block title %}AI Chat · MoodMate{% endblock %}
+{% load static %}
+{% block title %}MoodMate · Chat{% endblock %}
+
 {% block content %}
 
-<div class="max-w-4xl mx-auto mt-8 px-4 flex flex-col h-[80vh]">
+<div class="max-w-5xl mx-auto mt-6 flex flex-col h-[85vh]">
 
-  <!-- HEADER -->
-  <div class="flex items-center justify-between mb-4">
-    <div>
-      <h1 class="text-3xl font-bold text-[var(--text)]">AI Companion</h1>
-      <p class="text-[var(--muted)]">Talk freely. I'm listening 💬</p>
+  <!-- HEADER BAR -->
+  <div class="flex items-center justify-between border-b border-[var(--border)] pb-3 mb-3">
+
+    <!-- Back -->
+    <a href="{% url 'chat_list' %}" class="text-xl text-[var(--muted)] hover:text-[var(--text)]">
+      ←
+    </a>
+
+    <!-- Title -->
+    <div class="text-center">
+      <h2 class="text-xl font-semibold text-[var(--text)]">MoodMate</h2>
+      <p class="text-xs text-[var(--muted)]">Your mate for every moods</p>
     </div>
 
-    <a href="{% url 'new_ai_chat' %}"
-       class="px-4 py-2 rounded-xl bg-[var(--primary)] text-white text-sm font-medium">
-      + New Chat
+    <!-- Know Yourself Better -->
+    <a href="{% url 'podcast_processing' session.id %}"
+       class="px-3 py-1.5 rounded-lg bg-[var(--primary)] text-white text-xs font-medium">
+       Generate Audio Insights
     </a>
+
   </div>
 
-  <!-- CHAT WINDOW -->
-  <div id="chatWindow"
-       class="flex-1 overflow-y-auto space-y-4 p-4 bg-[var(--surface)]
-              border border-[var(--border)] rounded-2xl">
+
+  <!-- CHAT BODY -->
+  <div id="chat-body"
+       class="flex-1 overflow-y-auto space-y-4 px-1">
 
     {% for message in messages %}
-
+      
       {% if message.sender == "ai" %}
-      <!-- AI MESSAGE -->
+      <!-- AI Message -->
       <div class="flex items-start gap-3">
-        <div class="w-9 h-9 rounded-full bg-[var(--primary)] flex items-center justify-center text-white">
-          🤖
-        </div>
-        <div class="bg-white border border-[var(--border)] rounded-2xl px-4 py-2 max-w-[70%]">
-          <p class="text-sm">{{ message.text }}</p>
-        </div>
-      </div>
+        <img src="{% static 'images/moodmate_logo.png' %}"
+             class="w-9 h-9 rounded-full">
 
-      {% else %}
-      <!-- USER MESSAGE -->
-      <div class="flex justify-end">
-        <div class="bg-[var(--primary)] text-white rounded-2xl px-4 py-2 max-w-[70%]">
-          <p class="text-sm">{{ message.text }}</p>
+        <div class="bg-[var(--surface)] border border-[var(--border)]
+                    rounded-2xl px-4 py-2 text-sm max-w-[75%]">
+          {{ message.text }}
         </div>
       </div>
       {% endif %}
 
-    {% endfor %}
 
+      {% if message.sender == "user" %}
+      <!-- User Message -->
+      <div class="flex items-start gap-3 justify-end">
+        
+        <div class="bg-[var(--primary)] text-white
+                    rounded-2xl px-4 py-2 text-sm max-w-[75%]">
+          {{ message.text }}
+        </div>
+
+        <img src="{% static 'images/user_avatar.png' %}"
+             class="w-9 h-9 rounded-full">
+      </div>
+      {% endif %}
+
+    {% endfor %}
   </div>
 
-  <!-- INPUT BAR -->
-  <form method="post" class="mt-4 flex gap-3">
-    {% csrf_token %}
-    <input name="message"
-           placeholder="Type your message..."
-           class="flex-1 px-4 py-3 rounded-xl border border-[var(--border)]
-                  bg-[var(--surface)] focus:outline-none focus:ring-2
-                  focus:ring-[var(--primary)]">
 
-    <button class="px-5 py-3 rounded-xl bg-[var(--primary)] text-white font-medium">
-      Send ➤
-    </button>
+  <!-- INPUT AREA -->
+  <form method="POST" class="mt-3">
+    {% csrf_token %}
+
+    <div class="flex items-center gap-2 bg-[var(--surface)]
+                border border-[var(--border)]
+                rounded-xl px-3 py-2">
+
+      <!-- Attach (future image upload) -->
+      <span class="text-lg text-[var(--muted)] cursor-pointer">📎</span>
+
+      <input type="text"
+             name="message"
+             placeholder="Type your message..."
+             required
+             class="flex-1 bg-transparent outline-none text-sm">
+
+      <button type="submit"
+              class="w-9 h-9 rounded-full bg-[var(--primary)]
+                     text-white flex items-center justify-center">
+        ➤
+      </button>
+    </div>
   </form>
 
 </div>
+
+
+<script>
+  // Auto-scroll to bottom
+  const chatBody = document.getElementById("chat-body");
+  chatBody.scrollTop = chatBody.scrollHeight;
+</script>
 
 {% endblock %}
