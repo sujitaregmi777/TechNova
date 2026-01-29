@@ -501,14 +501,14 @@ def cleanup_stuck_chat_podcasts():
 
 @login_required
 def chat_list(request):
-    cleanup_stuck_chat_podcasts()   # 👈 add this line
+    cleanup_stuck_chat_podcasts()  
 
     chats = ChatSession.objects.filter(owner=request.user)
     chats = apply_common_filters(chats, request)
     return render(request, "core/chat_list.html", {"chats": chats})
 
 def podcast_list():
-    cleanup_stuck_chat_podcasts()   # 👈 add this line
+    cleanup_stuck_chat_podcasts()   
 
     podcasts = Podcast.objects.filter(owner=request.user, status="ready")
     podcasts = apply_common_filters(podcasts, request)
