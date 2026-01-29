@@ -57,6 +57,12 @@ urlpatterns = [
     path("read/<int:pk>/", views.article_detail, name="article_detail"),
     path("blogs/", views.blogs, name="blogs"),
     path("reflections/<int:pk>/delete/",views.delete_reflection,name="delete_reflection"),
+    path(
+  "reflections/<int:pk>/favorite/",
+  views.toggle_reflection_favorite,
+  name="toggle_reflection_favorite"
+),
+
 
     
 

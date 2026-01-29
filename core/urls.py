@@ -4,7 +4,7 @@ from django.conf.urls.static import static
 from django.conf import settings
 from accounts.views import dashboard
 from core.views import (
-    ai_chat,
+    # ai_chat,
     delete_podcast,
     enter_journal,
     journal_list,
@@ -33,8 +33,8 @@ urlpatterns = [
     path("toggle-favorite/<int:id>/", toggle_favorite, name="toggle_favorite"),
     path("delete-podcast/<int:id>/", delete_podcast, name="delete_podcast"),
 
-    path("ai-chat/", ai_chat, name="ai_chat"),
-    path("ai-chat/new/", new_ai_chat, name="new_ai_chat"),
+    # path("ai-chat/", ai_chat, name="ai_chat"),
+    # path("ai-chat/new/", new_ai_chat, name="new_ai_chat"),
 
 
 ]

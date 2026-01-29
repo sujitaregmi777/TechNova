@@ -61,6 +61,11 @@ class Reflection(models.Model):
 
     title = models.CharField(max_length=200)
     text = models.TextField()
+    favorites = models.ManyToManyField(
+        settings.AUTH_USER_MODEL,
+        related_name="favorite_reflections",
+        blank=True
+    )
 
     image = models.ImageField(
         upload_to="reflections/",

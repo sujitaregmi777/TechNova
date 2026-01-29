@@ -78,7 +78,7 @@
         <div class="flex items-center gap-4">
 
           <!-- Favorite -->
-          <button onclick="toggleFavorite({{ podcast.id }}, this)">
+          <button onclick="toggleFavorite('{{ podcast.id }}', this)">
             {% if podcast.favorite %}
               <span class="text-red-500 text-xl">❤️</span>
             {% else %}
@@ -88,11 +88,11 @@
 
           <!-- 3-dot menu -->
           <div class="relative">
-            <button onclick="toggleMenu({{ podcast.id }})" class="text-xl text-gray-400">⋮</button>
+            <button onclick="toggleMenu('{{ podcast.id }}')" class="text-xl text-gray-400">⋮</button>
 
             <div id="menu-{{ podcast.id }}"
                  class="hidden absolute right-0 mt-2 w-28 bg-white border border-[var(--border)] rounded-xl shadow text-sm z-10">
-              <button onclick="deletePodcast({{ podcast.id }})"
+              <button onclick="deletePodcast('{{ podcast.id }}')"
                 class="block w-full text-left px-4 py-2 hover:bg-red-50 text-red-500">
                 Delete
               </button>

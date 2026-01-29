@@ -35,6 +35,8 @@ html.dark {
 
 <body class="bg-[var(--bg)] text-[var(--text)] min-h-screen flex transition-colors duration-200">
 
+  
+
 <!-- SIDEBAR -->
 <aside
   class="group w-20 hover:w-72 transition-all duration-300
@@ -77,6 +79,12 @@ html.dark {
       <span class="material-symbols-outlined text-[var(--primary)]">air</span>
       <span class="hidden group-hover:block font-medium">Breathing</span>
     </a>
+    <a href="/blogs/"
+   class="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-[var(--surface-alt)]">
+  <span class="material-symbols-outlined text-[var(--primary)]">explore</span>
+  <span class="hidden group-hover:block font-medium">Explore</span>
+</a>
+
 
   </nav>
 
@@ -170,10 +178,31 @@ html.dark {
 </div>
 
   </header>
+  {% if messages %}
+  <div class="max-w-3xl mx-auto px-4 mt-6 space-y-3">
+    {% for message in messages %}
+      <div
+        class="px-4 py-3 rounded-xl text-sm
+        {% if message.tags == 'error' %}
+          bg-red-100 text-red-700
+        {% elif message.tags == 'warning' %}
+          bg-yellow-100 text-yellow-800
+        {% elif message.tags == 'success' %}
+          bg-green-100 text-green-700
+        {% else %}
+          bg-gray-100 text-gray-700
+        {% endif %}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
 
   <!-- CONTENT -->
   <main class="flex-1 p-6 sm:p-8">
     {% block content %}{% endblock %}
+    
   </main>
 
 </div>

@@ -311,33 +311,39 @@ def edit_reflection(request, pk):
 
 @login_required
 def add_comment(request, pk):
-
     reflection = get_object_or_404(Reflection, pk=pk)
 
     if request.method == "POST":
         form = CommentForm(request.POST)
         if form.is_valid():
             content = form.cleaned_data["content"]
-            print("🔥 COMMENT FORM SUBMITTED")
 
             check = check_content(content)
-            print("✅ BEFORE CHECK")
-
-
 
             if check == "hard":
-                messages.error(request, "This comment contains harmful language.")
+                messages.error(
+                    request,
+                    "This comment wasn’t posted because it may be harmful."
+                )
                 return redirect("reflection_detail", pk=pk)
-
-            if check == "soft":
-                messages.warning(request, "Please keep responses supportive.")
 
             comment = form.save(commit=False)
             comment.author = request.user
             comment.reflection = reflection
+
+            if check == "soft":
+                comment.is_approved = True
+                messages.warning(
+                    request,
+                    "Please try to keep responses kind and supportive."
+                )
+            else:
+                comment.is_approved = True
+
             comment.save()
 
     return redirect("reflection_detail", pk=pk)
+
 
 def explore(request):
     articles = Article.objects.order_by("-created_at")
@@ -456,6 +462,17 @@ def settings(request):
         "profile": profile,
     }
     return render(request, "accounts/settings.html", context)
+
+@login_required
+def toggle_reflection_favorite(request, pk):
+    reflection = get_object_or_404(Reflection, pk=pk)
+
+    if request.user in reflection.favorites.all():
+        reflection.favorites.remove(request.user)
+    else:
+        reflection.favorites.add(request.user)
+
+    return redirect("reflections_list")
 
 
 

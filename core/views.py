@@ -6,12 +6,13 @@ from core.utils.filters import apply_common_filters
 
 from core.models import Journal, Podcast
 from core.forms import JournalForm
-
 from moodmate.reflectcast.audio.generate_audio import text_to_podcast
 from moodmate.reflectcast.audio.mix_audio import mix_voice_with_ambient
 from moodmate.reflectcast.input.handlers import process_input
 from moodmate.reflectcast.nlp.generate_script import create_script
 from moodmate.reflectcast.nlp.generate_title import generate_podcast_title
+from .utils import  update_streak
+
 
 
 # ---------------------------------------------------
@@ -101,14 +102,17 @@ def journal_create(request):
             journal = form.save(commit=False)
             journal.owner = request.user
 
+            # Auto-generate title if empty
             if not journal.title.strip():
-                # Generate AI title (Gemini or fallback)
                 journal.title = generate_podcast_title(
-                 reflection=journal.content,
-                 emotion=journal.mood
-             )
+                    reflection=journal.content,
+                    emotion=journal.mood
+                )
 
             journal.save()
+
+            # ✅ STREAK ONLY UPDATES AFTER SUCCESSFUL SAVE
+            update_streak(request.user)
 
             # ---- Case 1: Save only ----
             if action == "save":
@@ -117,7 +121,7 @@ def journal_create(request):
             # ---- Case 2: Go to AI chat ----
             if action == "chat":
                 request.session["chat_journal_id"] = journal.id
-                return redirect("ai_chat")   # we’ll wire this next
+                return redirect("ai_chat")
 
             # ---- Case 3: Generate podcast ----
             if action == "podcast":
@@ -137,9 +141,12 @@ def journal_create(request):
                 return redirect("podcast_processing", podcast.id)
 
     else:
-        form = JournalForm()
+        # ✅ READ mood coming from dashboard
+        mood_from_dashboard = request.GET.get("mood")
+        form = JournalForm(initial={"mood": mood_from_dashboard})
 
     return render(request, "core/journal_input.html", {"form": form})
+
 
 
 @login_required
@@ -211,36 +218,36 @@ def podcast_list(request):
         "podcasts": podcasts
     })
 
-@login_required
-def chat_list(request):
-    chats = Chat.objects.filter(owner=request.user)
-    chats = apply_common_filters(chats, request)
+# @login_required
+# def chat_list(request):
+#     chats = Chat.objects.filter(owner=request.user)
+#     chats = apply_common_filters(chats, request)
 
-    return render(request, "core/chat_list.html", {
-        "chats": chats
-    })
+#     return render(request, "core/chat_list.html", {
+#         "chats": chats
+#     })
 
-def ai_chat(request):
-    messages = ChatMessage.objects.filter(user=request.user).order_by("created_at")
+# def ai_chat(request):
+#     messages = ChatMessage.objects.filter(user=request.user).order_by("created_at")
 
-    if request.method == "POST":
-        user_text = request.POST["message"]
+#     if request.method == "POST":
+#         user_text = request.POST["message"]
 
-        ChatMessage.objects.create(
-            user=request.user,
-            sender="user",
-            text=user_text
-        )
+#         ChatMessage.objects.create(
+#             user=request.user,
+#             sender="user",
+#             text=user_text
+#         )
 
-        # --- AI response (later connect to Ollama) ---
-        ai_reply = generate_ai_reply(user_text)
+#         # --- AI response (later connect to Ollama) ---
+#         ai_reply = generate_ai_reply(user_text)
 
-        ChatMessage.objects.create(
-            user=request.user,
-            sender="ai",
-            text=ai_reply
-        )
+#         ChatMessage.objects.create(
+#             user=request.user,
+#             sender="ai",
+#             text=ai_reply
+#         )
 
-        return redirect("ai_chat")
+#         return redirect("ai_chat")
 
-    return render(request, "ai_chat.html", {"messages": messages})
+#     return render(request, "ai_chat.html", {"messages": messages})

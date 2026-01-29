@@ -12,7 +12,7 @@
       {% else %}
         A quiet space to write
       {% endif %}
-    </h1>
+        </h1>
 
     <p class="text-[var(--muted)] max-w-xl">
       There’s no right way to do this. Just notice what feels present.
@@ -38,24 +38,44 @@
           How are you feeling right now?
         </label>
 
-        <div class="flex flex-wrap gap-3" id="moodSelect">
-          {% for value,label in form.mood.field.choices %}
-            <button type="button"
-              data-value="{{ value }}"
-              class="mood-pill px-4 py-2 rounded-full
-                     border border-[var(--border)]
-                     text-sm
-                     hover:border-[var(--primary)]
-                     hover:scale-105
-                     active:scale-95
-                     transition-all duration-200">
-              {{ label }}
-            </button>
-          {% endfor %}
-        </div>
+ <div class="grid grid-cols-3 sm:grid-cols-6 gap-4" id="moodSelect">
+
+  <button type="button" data-mood="happy" class="mood-pill mood-box">
+    <span class="material-symbols-outlined">sentiment_satisfied</span>
+    <span class="label">Happy</span>
+  </button>
+
+  <button type="button" data-mood="sad" class="mood-pill mood-box">
+    <span class="material-symbols-outlined">sentiment_dissatisfied</span>
+    <span class="label">Sad</span>
+  </button>
+
+  <button type="button" data-mood="anxious" class="mood-pill mood-box">
+    <span class="material-symbols-outlined">sentiment_neutral</span>
+    <span class="label">Anxious</span>
+  </button>
+
+  <button type="button" data-mood="calm" class="mood-pill mood-box">
+    <span class="material-symbols-outlined">water_drop</span>
+    <span class="label">Calm</span>
+  </button>
+
+  <button type="button" data-mood="grateful" class="mood-pill mood-box">
+    <span class="material-symbols-outlined">favorite</span>
+    <span class="label">Grateful</span>
+  </button>
+
+  <button type="button" data-mood="overwhelmed" class="mood-pill mood-box">
+    <span class="material-symbols-outlined">waves</span>
+    <span class="label">Overwhelmed</span>
+  </button>
+
+</div>
+
+
 
         <!-- Hidden real input -->
-        {{ form.mood.as_hidden }}
+        <input type="hidden" name="mood" id="id_mood" value="{{ form.mood.value|default:'' }}">
       </div>
 
       <!-- Content -->
@@ -139,13 +159,21 @@
   const pills = document.querySelectorAll(".mood-pill");
   const moodInput = document.querySelector("input[name='mood']");
 
+if (moodInput.value) {
+    pills.forEach(pill => {
+      if (pill.dataset.mood === moodInput.value) {
+        pill.classList.add("bg-[var(--primary)]", "text-white");
+      }
+    });
+  }
+
   pills.forEach(pill => {
     pill.addEventListener("click", () => {
-      pills.forEach(p => {
-        p.classList.remove("bg-[var(--primary)]","text-white");
-      });
-      pill.classList.add("bg-[var(--primary)]","text-white");
-      moodInput.value = pill.dataset.value;
+      pills.forEach(p =>
+        p.classList.remove("bg-[var(--primary)]", "text-white")
+      );
+      pill.classList.add("bg-[var(--primary)]", "text-white");
+      moodInput.value = pill.dataset.mood;
     });
   });
 </script>

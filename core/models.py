@@ -18,7 +18,9 @@ class Journal(models.Model):
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name="journals"
+        related_name="journals",
+            null=True,
+
     )
 
     title = models.CharField(max_length=200, blank=True)
@@ -56,8 +58,23 @@ class Podcast(models.Model):
     def __str__(self):
         return self.title
 
+class ChatSession(models.Model):
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    title = models.CharField(max_length=200, default="AI Reflection")
+    created_at = models.DateTimeField(auto_now_add=True)
+    completed = models.BooleanField(default=False)
+
 class ChatMessage(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    sender = models.CharField(max_length=10)  # "user" or "ai"
+    session = models.ForeignKey(ChatSession, on_delete=models.CASCADE, related_name="messages")
+    sender = models.CharField(max_length=10)  # "ai" or "user"
     text = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+class ChatPodcast(models.Model):
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    session = models.ForeignKey(ChatSession, on_delete=models.CASCADE)
+    title = models.CharField(max_length=200)
+    script = models.TextField()
+    audio_file = models.FileField(upload_to="chat_podcasts/")
+    status = models.CharField(max_length=20, default="processing")
     created_at = models.DateTimeField(auto_now_add=True)
