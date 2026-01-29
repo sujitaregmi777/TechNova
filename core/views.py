@@ -507,7 +507,7 @@ def chat_list(request):
     chats = apply_common_filters(chats, request)
     return render(request, "core/chat_list.html", {"chats": chats})
 
-def podcast_list():
+def podcast_list(request):
     cleanup_stuck_chat_podcasts()   
 
     podcasts = Podcast.objects.filter(owner=request.user, status="ready")
