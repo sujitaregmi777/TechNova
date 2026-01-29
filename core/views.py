@@ -278,10 +278,10 @@ def ai_chat(request, session_id):
     session = get_object_or_404(ChatSession, id=session_id, owner=request.user)
     messages = session.messages.order_by("created_at")
 
-#     if request.method == "POST":
-#         user_text = request.POST["message"]
+    if request.method == "POST":
+        user_text = request.POST["message"]
 
-    ChatMessage.objects.create(
+        ChatMessage.objects.create(
             session=session,
             sender="user",
             text=user_text
