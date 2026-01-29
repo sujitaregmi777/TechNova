@@ -37,7 +37,7 @@ def mix_voice_with_ambient(voice_path, mood, podcast_id):
         ambient = ambient * (len(voice) // len(ambient) + 1)
 
     ambient = ambient[:len(voice)]  # match audio lengths
-    ambient = ambient[:len(voice)] - 18  # reduce volume
+    ambient = ambient[:len(voice)] - 8 # reduce volume
     mixed = voice.overlay(ambient)
 
     output_dir = os.path.join(settings.MEDIA_ROOT, "audio") 

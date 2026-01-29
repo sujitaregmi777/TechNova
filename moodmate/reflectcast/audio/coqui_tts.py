@@ -45,5 +45,7 @@ def generate_tts_with_coqui(text, output_path=None):
     output_path.parent.mkdir(parents=True, exist_ok=True)
     asyncio.run(_edge_generate(text, str(output_path)))
     print("[Edge TTS] Audio generation complete!\n")
-
+    sound = AudioSegment.from_file(output_path)
+    slower = sound.speedup(playback_speed=0.9)
+    slower.export(output_path, format="wav")
     return str(output_path)
